@@ -2,437 +2,478 @@
 
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ComposedChart,
-  Area,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  RadialBarChart,
-  RadialBar,
 } from "recharts";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Card, CardHeader, CardBody } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
-import { Badge } from "@/components/ui/Badge";
-import {
-  trafficSeries,
-  salesSeries,
-  behaviors,
-  demographics,
-  areas,
-} from "@/lib/mock";
-import { fmt } from "@/lib/utils";
-import { Users, TrendingUp, Timer, Car, Eye, MessageSquare } from "lucide-react";
+import { Users, TrendingUp, Timer, ClipboardList } from "lucide-react";
 
-const PIE_COLORS = [
-  "var(--color-accent)",
-  "var(--color-pink)",
-  "var(--color-purple)",
-  "var(--color-teal)",
-  "var(--color-warning)",
+const DATE_RANGES = ["今日", "本月", "自訂"] as const;
+
+const flow30 = [
+  320, 410, 380, 520, 490, 610, 580, 720, 680, 750,
+  820, 790, 850, 910, 880, 920, 980, 1020, 960, 1050,
+  1100, 1080, 1150, 1200, 1180, 1220, 1300, 1250, 1320, 1400,
+].map((v, i) => ({ d: `04/${String(i + 1).padStart(2, "0")}`, 人流: v }));
+
+const weekFlow = [
+  { day: "一", value: 312 },
+  { day: "二", value: 278 },
+  { day: "三", value: 345 },
+  { day: "四", value: 401 },
+  { day: "五", value: 523 },
+  { day: "六", value: 687 },
+  { day: "日", value: 598 },
 ];
 
-export default function OverviewPage() {
-  const totalBehavior = behaviors.reduce((a, b) => a + b.count, 0);
+const ageGender = [
+  { age: "<18", 男性: 12, 女性: 8 },
+  { age: "18-24", 男性: 45, 女性: 38 },
+  { age: "25-34", 男性: 89, 女性: 72 },
+  { age: "35-44", 男性: 76, 女性: 68 },
+  { age: "45-54", 男性: 54, 女性: 61 },
+  { age: "55+", 男性: 32, 女性: 28 },
+];
 
+const topTypes = [
+  { label: "瀏覽商品", pct: 38, color: "#3b82f6" },
+  { label: "觸摸商品", pct: 24, color: "#6366f1" },
+  { label: "商談諮詢", pct: 18, color: "#8b5cf6" },
+  { label: "填寫問卷", pct: 12, color: "#a78bfa" },
+  { label: "其他", pct: 8, color: "#c4b5fd" },
+];
+
+const areaTime = [
+  { label: "展示區A", pct: 31, color: "#3b82f6" },
+  { label: "展示區B", pct: 22, color: "#6366f1" },
+  { label: "商談區", pct: 20, color: "#8b5cf6" },
+  { label: "入口大廳", pct: 15, color: "#f59e0b" },
+  { label: "其他", pct: 12, color: "#e2e8f0" },
+];
+
+const funnel = [
+  { label: "進店總人流", value: 1247, pct: 100, color: "#3b82f6" },
+  { label: "賞車行為人數", value: 842, pct: 67.5, color: "#6366f1" },
+  { label: "觸摸商品人數", value: 523, pct: 41.9, color: "#8b5cf6" },
+  { label: "商談/試乘人數", value: 201, pct: 16.1, color: "#a78bfa" },
+  { label: "填寫問卷人數", value: 312, pct: 25.0, color: "#f59e0b" },
+];
+
+const companions = [
+  { label: "獨自一人", count: 412, avg: "12.4分", color: "#3b82f6" },
+  { label: "2人同行", count: 389, avg: "21.8分", color: "#6366f1" },
+  { label: "3人同行", count: 267, avg: "26.3分", color: "#8b5cf6" },
+  { label: "4人以上", count: 179, avg: "31.7分", color: "#f59e0b" },
+];
+
+function SectionHeader({
+  title,
+  subtitle,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}) {
   return (
-    <>
-      <PageHeader
-        eyebrow="OVERVIEW"
-        title="商場總覽"
-        desc="全店營運即時指標、當月表現與顧客結構。"
-        action={
-          <div className="flex items-center gap-2">
-            <Badge tone="success">● 即時</Badge>
-            <span className="text-xs text-muted">更新於 3 秒前</span>
+    <div className="flex items-center justify-between mb-4 px-5 pt-4">
+      <div>
+        <div className="text-[16px] font-bold text-foreground leading-tight">
+          {title}
+        </div>
+        {subtitle && (
+          <div className="text-[12px] text-muted-2 mt-0.5">{subtitle}</div>
+        )}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+export default function OverviewPage() {
+  return (
+    <div className="p-6">
+      {/* Title + date range */}
+      <div className="flex items-start justify-between mb-5">
+        <div>
+          <div className="text-[20px] font-bold text-foreground">商場總覽</div>
+          <div className="text-[12px] text-muted-2 mt-1">
+            台北信義旗艦店 · 2026年4月
           </div>
-        }
-      />
-
-      <div className="p-6 space-y-6">
-        {/* KPI */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Stat
-            label="今日總人數"
-            value={fmt(2180)}
-            unit="人"
-            delta={12.4}
-            tone="accent"
-            icon={<Users size={14} />}
-            hint="vs 昨日"
-          />
-          <Stat
-            label="當月平均人流"
-            value={fmt(1820)}
-            unit="人/日"
-            delta={-3.1}
-            tone="default"
-            icon={<TrendingUp size={14} />}
-            hint="vs 上月"
-          />
-          <Stat
-            label="今日銷售額"
-            value="$682K"
-            delta={8.2}
-            tone="success"
-            icon={<Car size={14} />}
-            hint="新台幣"
-          />
-          <Stat
-            label="當月平均銷售"
-            value="$512K"
-            delta={5.6}
-            tone="warning"
-            icon={<Timer size={14} />}
-            hint="日均"
-          />
         </div>
-
-        {/* 折線圖 */}
-        <div className="grid grid-cols-12 gap-6">
-          <Card className="col-span-12 lg:col-span-8">
-            <CardHeader
-              title="人流 vs 去年同期"
-              desc="以小時顯示當日進店人次"
-              action={
-                <div className="flex gap-1 text-xs">
-                  {["今日", "週", "月"].map((t, i) => (
-                    <button
-                      key={t}
-                      className={
-                        "px-2.5 py-1 rounded-md " +
-                        (i === 0
-                          ? "bg-accent text-white"
-                          : "text-muted hover:bg-surface-2")
-                      }
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
+        <div className="flex gap-2">
+          {DATE_RANGES.map((t, i) => (
+            <button
+              key={t}
+              className={
+                "px-3 py-1.5 rounded-md border text-xs transition " +
+                (i === 1
+                  ? "bg-accent text-white border-accent"
+                  : "bg-surface text-muted border-border hover:bg-surface-2")
               }
-            />
-            <CardBody>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={trafficSeries}>
-                    <defs>
-                      <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#2f68ff" stopOpacity={0.35} />
-                        <stop offset="100%" stopColor="#2f68ff" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid stroke="#eef0f5" vertical={false} />
-                    <XAxis
-                      dataKey="hour"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid #e5e7ef",
-                        fontSize: 12,
-                      }}
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: 11 }}
-                      iconType="circle"
-                      iconSize={8}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="人流"
-                      stroke="#2f68ff"
-                      strokeWidth={2}
-                      fill="url(#g1)"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="去年同期"
-                      stroke="#98a2b3"
-                      strokeDasharray="4 3"
-                      strokeWidth={1.5}
-                      dot={false}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card className="col-span-12 lg:col-span-4">
-            <CardHeader title="性別 · 年齡佔比" desc="當日進店顧客結構" />
-            <CardBody>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={demographics.ageGender}
-                    layout="vertical"
-                    barSize={12}
-                  >
-                    <CartesianGrid stroke="#eef0f5" horizontal={false} />
-                    <XAxis
-                      type="number"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      dataKey="age"
-                      type="category"
-                      tick={{ fontSize: 11, fill: "#667085" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip />
-                    <Bar dataKey="男性" stackId="a" fill="#2f68ff" radius={[0, 0, 0, 0]} />
-                    <Bar dataKey="女性" stackId="a" fill="#ee5da1" radius={[0, 2, 2, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-xs text-muted">
-                <span>
-                  <span className="inline-block w-2 h-2 rounded-full bg-accent mr-1" />
-                  男性 58%
-                </span>
-                <span>
-                  <span className="inline-block w-2 h-2 rounded-full bg-pink mr-1" />
-                  女性 42%
-                </span>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-
-        {/* 銷售 + 行為 */}
-        <div className="grid grid-cols-12 gap-6">
-          <Card className="col-span-12 lg:col-span-7">
-            <CardHeader title="銷售額 vs 去年同期" desc="最近 30 日日均" />
-            <CardBody>
-              <div className="h-56">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={salesSeries}>
-                    <CartesianGrid stroke="#eef0f5" vertical={false} />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`}
-                    />
-                    <Tooltip
-                      formatter={(v) => `$${fmt(Number(v))}`}
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid #e5e7ef",
-                        fontSize: 12,
-                      }}
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: 11 }}
-                      iconType="circle"
-                      iconSize={8}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="銷售額"
-                      stroke="#12b76a"
-                      strokeWidth={2.4}
-                      dot={false}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="去年同期"
-                      stroke="#98a2b3"
-                      strokeWidth={1.5}
-                      strokeDasharray="4 3"
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardBody>
-          </Card>
-
-          <Card className="col-span-12 lg:col-span-5">
-            <CardHeader title="顧客行為佔比" desc="各行為人次 / 平均持續時間" />
-            <CardBody>
-              <ul className="space-y-3">
-                {behaviors.map((b) => (
-                  <li key={b.name}>
-                    <div className="flex items-center justify-between mb-1 text-xs">
-                      <div className="flex items-center gap-2">
-                        <Badge tone={b.tone}>{b.name}</Badge>
-                        <span className="text-muted tabular-nums">
-                          {fmt(b.count)} 人
-                        </span>
-                      </div>
-                      <span className="text-muted">
-                        {b.avg ? `${b.avg}s` : "—"}
-                      </span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-surface-2 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-accent/80"
-                        style={{
-                          width: `${(b.count / totalBehavior) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
-        </div>
-
-        {/* Pies 1 */}
-        <div className="grid grid-cols-12 gap-6">
-          <Card className="col-span-12 md:col-span-4">
-            <CardHeader
-              title="同行人數佔比"
-              desc="獨自前往 vs 結伴比例"
-              action={<Eye size={14} className="text-muted-2" />}
-            />
-            <CardBody>
-              <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={demographics.companions}
-                      dataKey="value"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
-                    >
-                      {demographics.companions.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                {demographics.companions.map((c, i) => (
-                  <li key={c.name} className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ background: PIE_COLORS[i] }}
-                      />
-                      {c.name}
-                    </span>
-                    <span className="text-muted tabular-nums">{c.value}%</span>
-                  </li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
-
-          <Card className="col-span-12 md:col-span-4">
-            <CardHeader
-              title="停留最久區域"
-              desc="前 5 區域佔比 (平均停留秒數)"
-              action={<MessageSquare size={14} className="text-muted-2" />}
-            />
-            <CardBody>
-              <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={areas}
-                      dataKey="count"
-                      nameKey="name"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
-                    >
-                      {areas.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(v, _n, e) =>
-                        `${fmt(Number(v))} 人 (${(e?.payload as { stay?: number } | undefined)?.stay ?? 0}s)`
-                      }
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <ul className="grid grid-cols-1 gap-1 text-xs">
-                {areas.map((a, i) => (
-                  <li key={a.id} className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ background: PIE_COLORS[i] }}
-                      />
-                      {a.name}
-                    </span>
-                    <span className="text-muted tabular-nums">
-                      {a.stay}s · {fmt(a.count)} 人
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </CardBody>
-          </Card>
-
-          <Card className="col-span-12 md:col-span-4">
-            <CardHeader title="高於平均停留時間" desc="問券填寫者行為比較" />
-            <CardBody>
-              <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    innerRadius="30%"
-                    outerRadius="95%"
-                    data={[
-                      { name: "高於平均", value: 68, fill: "#2f68ff" },
-                      { name: "平均", value: 52, fill: "#7a5af8" },
-                      { name: "低於平均", value: 34, fill: "#ee5da1" },
-                    ]}
-                    startAngle={90}
-                    endAngle={-270}
-                  >
-                    <RadialBar background dataKey="value" cornerRadius={6} />
-                    <Tooltip />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      wrapperStyle={{ fontSize: 11 }}
-                    />
-                  </RadialBarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="text-xs text-muted text-center mt-1">
-                佔比以 <b>188</b> 名填券顧客為基準
-              </div>
-            </CardBody>
-          </Card>
+            >
+              {t}
+            </button>
+          ))}
         </div>
       </div>
-    </>
+
+      {/* KPI row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <Stat
+          label="今日總人數"
+          value="1,247"
+          delta={5.7}
+          tone="accent"
+          icon={<Users size={14} />}
+          hint="當月平均 1,180"
+        />
+        <Stat
+          label="今日銷售額"
+          value="$86.4萬"
+          delta={6.4}
+          tone="success"
+          icon={<TrendingUp size={14} />}
+          hint="當月平均 $81.2萬"
+        />
+        <Stat
+          label="平均停留時間"
+          value="18.3"
+          unit="分"
+          delta={2.1}
+          tone="purple"
+          icon={<Timer size={14} />}
+          hint="高於平均 542 人"
+        />
+        <Stat
+          label="問卷填寫人數"
+          value="312"
+          delta={-3.2}
+          tone="warning"
+          icon={<ClipboardList size={14} />}
+          hint="佔總人流 25.0%"
+        />
+      </div>
+
+      {/* Row 1: daily flow + weekly flow */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <Card className="lg:col-span-2">
+          <SectionHeader title="每日人流趨勢" subtitle="本月每日進店總人數" />
+          <div className="px-5 pb-4">
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={flow30}>
+                  <defs>
+                    <linearGradient id="flowg" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.28} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke="#eef2f7" vertical={false} />
+                  <XAxis
+                    dataKey="d"
+                    tick={{ fontSize: 10, fill: "#94a3b8" }}
+                    axisLine={false}
+                    tickLine={false}
+                    interval={4}
+                  />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: "1px solid #e2e8f0",
+                      fontSize: 12,
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="人流"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    fill="url(#flowg)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex gap-6 mt-3">
+              {[
+                ["總人流", "36,840", "#3b82f6"],
+                ["週間均", "1,082", "#6366f1"],
+                ["週末均", "1,418", "#8b5cf6"],
+              ].map(([l, v, c]) => (
+                <div key={l}>
+                  <div className="text-[10px] text-muted-2">{l}</div>
+                  <div
+                    className="text-sm font-bold"
+                    style={{ color: c as string }}
+                  >
+                    {v}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader title="本週每日人流" />
+          <div className="px-5 pb-4">
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weekFlow}>
+                  <CartesianGrid stroke="#eef2f7" vertical={false} />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 10, fill: "#94a3b8" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: "1px solid #e2e8f0",
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Row 2: gender-age + behavior donut + area donut */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <Card>
+          <SectionHeader title="性別與年齡分佈" />
+          <div className="px-5 pb-4">
+            <div className="flex gap-4 items-center mb-3">
+              <div>
+                <div className="text-[10px] text-muted-2">男性佔比</div>
+                <div
+                  className="text-xl font-bold"
+                  style={{ color: "#3b82f6" }}
+                >
+                  52%
+                </div>
+              </div>
+              <div className="w-px h-8 bg-border" />
+              <div>
+                <div className="text-[10px] text-muted-2">女性佔比</div>
+                <div
+                  className="text-xl font-bold"
+                  style={{ color: "#f472b6" }}
+                >
+                  48%
+                </div>
+              </div>
+            </div>
+            <div className="h-36">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={ageGender}
+                  layout="vertical"
+                  barSize={10}
+                  barGap={2}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="age"
+                    tick={{ fontSize: 10, fill: "#94a3b8" }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={32}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 8,
+                      border: "1px solid #e2e8f0",
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar
+                    dataKey="男性"
+                    fill="#3b82f6"
+                    radius={[2, 2, 2, 2]}
+                  />
+                  <Bar
+                    dataKey="女性"
+                    fill="#f472b6"
+                    radius={[2, 2, 2, 2]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader title="顧客行為佔比" subtitle="前 5 種行為類型" />
+          <div className="px-5 pb-4 flex gap-4 items-center">
+            <div className="w-[110px] h-[110px] shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={topTypes}
+                    dataKey="pct"
+                    innerRadius={30}
+                    outerRadius={52}
+                    paddingAngle={1}
+                    stroke="none"
+                  >
+                    {topTypes.map((t) => (
+                      <Cell key={t.label} fill={t.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <ul className="flex-1 space-y-1.5">
+              {topTypes.map((t) => (
+                <li
+                  key={t.label}
+                  className="flex items-center justify-between text-[11px]"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <span
+                      className="w-2 h-2 rounded-sm"
+                      style={{ background: t.color }}
+                    />
+                    <span className="text-[#475569]">{t.label}</span>
+                  </span>
+                  <span className="text-[12px] font-semibold text-foreground">
+                    {t.pct}%
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader title="停留最久區域" />
+          <div className="px-5 pb-4 flex gap-4 items-center">
+            <div className="w-[110px] h-[110px] shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={areaTime}
+                    dataKey="pct"
+                    innerRadius={30}
+                    outerRadius={52}
+                    paddingAngle={1}
+                    stroke="none"
+                  >
+                    {areaTime.map((t) => (
+                      <Cell key={t.label} fill={t.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <ul className="flex-1 space-y-1.5">
+              {areaTime.map((t) => (
+                <li
+                  key={t.label}
+                  className="flex items-center justify-between text-[11px]"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <span
+                      className="w-2 h-2 rounded-sm"
+                      style={{ background: t.color }}
+                    />
+                    <span className="text-[#475569]">{t.label}</span>
+                  </span>
+                  <span className="text-[12px] font-semibold text-foreground">
+                    {t.pct}%
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Card>
+      </div>
+
+      {/* Row 3: funnel + companion */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <SectionHeader title="顧客行為漏斗" />
+          <div className="px-5 pb-4 space-y-2.5">
+            {funnel.map((row) => (
+              <div key={row.label}>
+                <div className="flex justify-between mb-1">
+                  <span className="text-[12px] text-[#475569]">
+                    {row.label}
+                  </span>
+                  <span className="text-[12px] font-semibold text-foreground">
+                    {row.value.toLocaleString()}{" "}
+                    <span className="text-muted-2 font-normal">
+                      ({row.pct}%)
+                    </span>
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-surface-2 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${row.pct}%`,
+                      background: row.color,
+                      transition: "width 0.5s",
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader title="同行人數與停留時間" />
+          <div className="px-5 pb-4">
+            {companions.map((row, i) => (
+              <div
+                key={row.label}
+                className={
+                  "flex items-center gap-3 py-2.5 " +
+                  (i < companions.length - 1
+                    ? "border-b border-[#f8fafc]"
+                    : "")
+                }
+              >
+                <div
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ background: row.color }}
+                />
+                <div className="flex-1">
+                  <div className="text-[12px] text-[#475569]">{row.label}</div>
+                  <div className="text-[10px] text-muted-2">
+                    {row.count} 人
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[13px] font-bold text-foreground">
+                    {row.avg}
+                  </div>
+                  <div className="text-[10px] text-muted-2">平均停留</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
   );
 }

@@ -1,64 +1,47 @@
 "use client";
 
-import { Bell, Calendar, ChevronDown, Search, UserCircle2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-export function Topbar() {
-  return (
-    <header className="h-14 shrink-0 bg-surface border-b border-border flex items-center gap-4 px-6">
-      <div className="flex items-center gap-2">
-        <button className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-sm hover:bg-surface-2">
-          <Store16 />
-          台北旗艦店
-          <ChevronDown size={14} className="text-muted" />
-        </button>
-        <button className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-sm hover:bg-surface-2">
-          <Calendar size={14} className="text-muted" />
-          2026/04/15 – 2026/04/22
-          <ChevronDown size={14} className="text-muted" />
-        </button>
-      </div>
-      <div className="flex-1" />
-      <div className="relative">
-        <Search
-          size={14}
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-2"
-        />
-        <input
-          placeholder="搜尋顧客、商品、區域..."
-          className="pl-8 pr-3 py-1.5 text-sm rounded-md border border-border bg-surface-2 w-64 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40"
-        />
-      </div>
-      <button className="relative p-2 rounded-md hover:bg-surface-2 text-muted">
-        <Bell size={16} />
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-danger" />
-      </button>
-      <button className="flex items-center gap-2 p-1.5 rounded-md hover:bg-surface-2">
-        <UserCircle2 size={22} className="text-muted" />
-        <div className="text-xs leading-tight text-left">
-          <div className="font-medium">Herry Chen</div>
-          <div className="text-muted">Store Manager</div>
-        </div>
-      </button>
-    </header>
+const PAGE_LABELS: Record<string, string> = {
+  "/overview": "商場總覽",
+  "/main": "主頁",
+  "/area": "區域",
+  "/heatmap": "熱力圖",
+  "/product": "商品",
+  "/customer": "顧客",
+  "/entrance": "出入口",
+  "/survey": "興趣評估",
+  "/stores": "店舖總覽",
+  "/survey-list": "問券列表",
+};
+
+function currentLabel(pathname: string) {
+  const entry = Object.entries(PAGE_LABELS).find(
+    ([href]) => pathname === href || pathname.startsWith(href + "/")
   );
+  return entry ? entry[1] : "Retail AI";
 }
 
-function Store16() {
+export function Topbar() {
+  const pathname = usePathname();
+  const label = currentLabel(pathname);
+
   return (
-    <svg
-      width={14}
-      height={14}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="text-muted"
-    >
-      <path d="m2 7 1-4h18l1 4" />
-      <path d="M4 10v10h16V10" />
-      <path d="M9 21v-6h6v6" />
-    </svg>
+    <header className="h-[52px] shrink-0 bg-surface border-b border-border flex items-center justify-between px-6">
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-muted-2">Retail AI</span>
+        <span className="text-xs text-border">/</span>
+        <span className="text-xs font-semibold text-foreground">{label}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="text-[11px] text-muted-2">
+          即時更新 · 2026-04-23 14:42
+        </div>
+        <div
+          className="w-2 h-2 rounded-full bg-success"
+          style={{ boxShadow: "0 0 6px rgba(16,185,129,0.5)" }}
+        />
+      </div>
+    </header>
   );
 }
