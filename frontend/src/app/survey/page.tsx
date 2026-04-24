@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -13,6 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
@@ -82,7 +82,7 @@ export default function SurveyPage() {
             />
             <CardBody>
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart
                     data={s.preferences}
                     layout="vertical"
@@ -114,7 +114,7 @@ export default function SurveyPage() {
                       ))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </CardBody>
           </Card>
@@ -126,7 +126,7 @@ export default function SurveyPage() {
             />
             <CardBody>
               <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart data={demographics.ageGender}>
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
@@ -159,7 +159,7 @@ export default function SurveyPage() {
                       radius={[6, 6, 0, 0]}
                     />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-3">
                 <MiniPie label="男性佔比" value={58} color="#3b82f6" />
@@ -178,7 +178,7 @@ export default function SurveyPage() {
             />
             <CardBody>
               <div className="h-60">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart data={s.behaviorPct}>
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
@@ -212,7 +212,7 @@ export default function SurveyPage() {
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </CardBody>
           </Card>
@@ -282,7 +282,7 @@ function MiniPie({
   return (
     <div className="flex items-center gap-2.5 rounded-lg border border-border px-3 py-2">
       <div className="w-12 h-12 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
+        <ChartContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
@@ -297,7 +297,7 @@ function MiniPie({
               ))}
             </Pie>
           </PieChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </div>
       <div>
         <div className="text-xs text-muted">{label}</div>

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  ResponsiveContainer,
   LineChart,
   Line,
   BarChart,
@@ -13,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
@@ -180,7 +180,7 @@ export default function EntrancePage() {
               />
               <CardBody>
                 <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <LineChart data={entranceSeries.slice(-14)}>
                       <CartesianGrid stroke="#eef0f5" vertical={false} />
                       <XAxis
@@ -222,7 +222,7 @@ export default function EntrancePage() {
                         dot={false}
                       />
                     </LineChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
               </CardBody>
             </Card>
@@ -234,7 +234,7 @@ export default function EntrancePage() {
               />
               <CardBody>
                 <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <BarChart
                       data={entrances.map((e) => ({
                         name: e.id.toUpperCase(),
@@ -264,7 +264,7 @@ export default function EntrancePage() {
                       <Bar dataKey="週間" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="週末" fill="#7a5af8" radius={[4, 4, 0, 0]} />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
                 <div className="mt-3 flex items-center justify-between text-xs text-muted">
                   <span>

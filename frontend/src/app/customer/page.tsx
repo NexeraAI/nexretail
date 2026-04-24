@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -13,6 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
@@ -70,7 +70,7 @@ export default function CustomerPage() {
             <CardHeader title="性別與年齡佔比" desc="最多 5 種類型顯示" />
             <CardBody>
               <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart data={demographics.ageGender}>
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
@@ -88,7 +88,7 @@ export default function CustomerPage() {
                     <Bar dataKey="男性" stackId="a" fill="#3b82f6" radius={[0, 0, 0, 0]} />
                     <Bar dataKey="女性" stackId="a" fill="#ee5da1" radius={[6, 6, 0, 0]} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </CardBody>
           </Card>
@@ -130,7 +130,7 @@ export default function CustomerPage() {
             <CardHeader title="同行人數佔比" desc="獨自 vs 結伴" />
             <CardBody>
               <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={companionData}
@@ -145,7 +145,7 @@ export default function CustomerPage() {
                     </Pie>
                     <Tooltip />
                   </PieChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
               <ul className="space-y-1 text-xs">
                 {companionData.map((c, i) => (

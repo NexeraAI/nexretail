@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ResponsiveContainer,
   AreaChart,
   Area,
   BarChart,
@@ -14,6 +13,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
 import { overviewSummary, stores } from "@/lib/mock";
@@ -97,7 +97,7 @@ export default function OverviewPage() {
           <CardHeader title="每日人流趨勢" desc="本月每日進店總人數" />
           <CardBody>
             <div className="h-40">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer>
                 <AreaChart data={flow30}>
                   <defs>
                     <linearGradient id="flowg" x1="0" x2="0" y1="0" y2="1">
@@ -129,7 +129,7 @@ export default function OverviewPage() {
                     fill="url(#flowg)"
                   />
                 </AreaChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
             <div className="flex gap-6 mt-3">
               {flowTotals.map((t) => (
@@ -151,7 +151,7 @@ export default function OverviewPage() {
           <CardHeader title="本週每日人流" />
           <CardBody>
             <div className="h-40">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer>
                 <BarChart data={weekFlow}>
                   <CartesianGrid stroke="#eef2f7" vertical={false} />
                   <XAxis
@@ -170,7 +170,7 @@ export default function OverviewPage() {
                   />
                   <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </CardBody>
         </Card>
@@ -203,7 +203,7 @@ export default function OverviewPage() {
               </div>
             </div>
             <div className="h-36">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer>
                 <BarChart
                   data={ageGender}
                   layout="vertical"
@@ -229,7 +229,7 @@ export default function OverviewPage() {
                   <Bar dataKey="男性" fill="#3b82f6" radius={[2, 2, 2, 2]} />
                   <Bar dataKey="女性" fill="#f472b6" radius={[2, 2, 2, 2]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </CardBody>
         </Card>
@@ -238,7 +238,7 @@ export default function OverviewPage() {
           <CardHeader title="顧客行為佔比" desc="前 5 種行為類型" />
           <CardBody className="flex gap-4 items-center">
             <div className="w-[110px] h-[110px] shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer>
                 <PieChart>
                   <Pie
                     data={topTypes}
@@ -253,7 +253,7 @@ export default function OverviewPage() {
                     ))}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
             <ul className="flex-1 space-y-1.5">
               {topTypes.map((t) => (
@@ -281,7 +281,7 @@ export default function OverviewPage() {
           <CardHeader title="停留最久區域" />
           <CardBody className="flex gap-4 items-center">
             <div className="w-[110px] h-[110px] shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer>
                 <PieChart>
                   <Pie
                     data={areaTime}
@@ -296,7 +296,7 @@ export default function OverviewPage() {
                     ))}
                   </Pie>
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
             <ul className="flex-1 space-y-1.5">
               {areaTime.map((t) => (

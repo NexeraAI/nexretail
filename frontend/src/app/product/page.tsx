@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
@@ -13,6 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
@@ -212,7 +212,7 @@ export default function ProductPage() {
               />
               <CardBody>
                 <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <BarChart data={viewByAge}>
                       <CartesianGrid stroke="#eef0f5" vertical={false} />
                       <XAxis
@@ -234,7 +234,7 @@ export default function ProductPage() {
                         ))}
                       </Bar>
                     </BarChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
               </CardBody>
             </Card>
@@ -243,7 +243,7 @@ export default function ProductPage() {
               <CardHeader title="互動動作佔比" desc="顧客與商品互動類型" />
               <CardBody>
                 <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={interactionMix}
@@ -258,7 +258,7 @@ export default function ProductPage() {
                       </Pie>
                       <Tooltip formatter={(v) => `${v}%`} />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
                 <ul className="grid grid-cols-2 gap-y-1 gap-x-3 text-xs">
                   {interactionMix.map((i, k) => (
@@ -284,7 +284,7 @@ export default function ProductPage() {
               <CardHeader title="性別年齡佔比" desc="觀看該商品顧客" />
               <CardBody>
                 <div className="h-36">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={demographics.gender}
@@ -302,7 +302,7 @@ export default function ProductPage() {
                       </Pie>
                       <Tooltip />
                     </PieChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
                 <ul className="space-y-1 text-xs">
                   {demographics.ageGender.map((a) => (

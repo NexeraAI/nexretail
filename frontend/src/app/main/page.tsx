@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import {
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   Tooltip,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -197,7 +197,7 @@ export default function MainPage() {
             <CardHeader title="區域停留佔比" desc="該顧客各區域時間" />
             <CardBody>
               <div className="h-40">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={areas}
@@ -213,7 +213,7 @@ export default function MainPage() {
                     </Pie>
                     <Tooltip />
                   </PieChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
               <ul className="mt-2 space-y-1 text-xs">
                 {areas.map((a, i) => (

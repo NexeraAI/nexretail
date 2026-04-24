@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  ResponsiveContainer,
   ComposedChart,
   Bar,
   XAxis,
@@ -14,6 +13,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { ChartContainer } from "@/components/viz/ChartContainer";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -153,7 +153,7 @@ export default function AreaPage() {
             />
             <CardBody>
               <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <ComposedChart data={weeklyTraffic}>
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
@@ -182,7 +182,7 @@ export default function AreaPage() {
                       dot={false}
                     />
                   </ComposedChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
             </CardBody>
           </Card>
@@ -194,7 +194,7 @@ export default function AreaPage() {
             <CardHeader title="客戶樣貌" desc="該區域顧客結構" />
             <CardBody>
               <div className="h-36">
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={demographics.gender}
@@ -212,7 +212,7 @@ export default function AreaPage() {
                     </Pie>
                     <Tooltip />
                   </PieChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span>
