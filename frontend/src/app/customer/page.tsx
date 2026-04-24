@@ -171,7 +171,7 @@ export default function CustomerPage() {
             desc={`${fmt(customers.length)} 位 · 點擊查看細節`}
             action={
               <div className="flex gap-1 text-xs">
-                {["全部", "感興趣", "已填券", "未打開"].map((t, i) => (
+                {["全部", "感興趣", "未打開"].map((t, i) => (
                   <button
                     key={t}
                     className={
@@ -216,10 +216,12 @@ export default function CustomerPage() {
                       {c.age} · {c.gender === "f" ? "女" : "男"}
                     </td>
                     <td className="px-3 py-2.5">{c.companions} 位</td>
-                    <td className="px-3 py-2.5 space-x-1">
-                      {c.interested && <Badge tone="success">感興趣</Badge>}
-                      {c.survey && <Badge tone="accent">已填券</Badge>}
-                      {!c.interested && !c.survey && <Badge>未打開</Badge>}
+                    <td className="px-3 py-2.5">
+                      {c.interested ? (
+                        <Badge tone="success">感興趣</Badge>
+                      ) : (
+                        <Badge>未打開</Badge>
+                      )}
                     </td>
                     <td className="px-5 py-2.5 text-right tabular-nums">
                       {Math.floor(c.stay / 60)}m {c.stay % 60}s

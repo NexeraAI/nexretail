@@ -14,12 +14,10 @@ const NAV = [
   { href: "/product", label: "商品", sub: "Product", icon: "◻" },
   { href: "/customer", label: "顧客", sub: "Customer", icon: "◎" },
   { href: "/entrance", label: "出入口", sub: "Entrance", icon: "⊏" },
-  { href: "/survey", label: "興趣評估", sub: "Survey", icon: "◈" },
 ];
 
 const ADMIN_LINKS = [
   { href: "/stores", label: "店舖總覽" },
-  { href: "/survey-list", label: "問券列表" },
 ];
 
 const STORE_NAMES = stores.map((s) => s.name);

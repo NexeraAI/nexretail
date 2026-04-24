@@ -118,7 +118,6 @@ export const behaviors = [
   { name: "觸摸商品", count: 1180, avg: 18, tone: "purple" as const },
   { name: "商談", count: 412, avg: 312, tone: "pink" as const },
   { name: "試乘 / 試坐", count: 236, avg: 205, tone: "warning" as const },
-  { name: "填寫問券", count: 188, avg: 148, tone: "success" as const },
 ];
 
 export const areas = [
@@ -184,9 +183,8 @@ export const customers = Array.from({ length: 24 }).map((_, i) => {
       (i * 7) % 60
     ).padStart(2, "0")}`,
     interested: rand() > 0.65,
-    survey: rand() > 0.78,
-    behaviors: ["進店", "駐足", "觸摸商品", "商談", "試乘", "填寫問券"]
-      .slice(0, ri(3, 6))
+    behaviors: ["進店", "駐足", "觸摸商品", "商談", "試乘"]
+      .slice(0, ri(3, 5))
       .map((b, k) => ({
         b,
         dur: ri(8, 220),
@@ -314,27 +312,6 @@ export const demographics = {
   ],
 };
 
-// ───────────── 問券 ─────────────
-const NEEDS = ["換車", "加購", "觀望", "詢價", "試乘後決定"];
-const STAFF = ["王佩芳", "劉威廷", "陳柏均", "林怡君", "黃俊皓"];
-
-export const surveys = Array.from({ length: 18 }).map((_, i) => {
-  const interested = ["M3", "i7", "X5", "M4 CS", "iX3"].slice(0, ri(1, 4));
-  const name = `${pick(LAST)}${pick(FIRST)}`;
-  return {
-    id: `srv-${2000 + i}`,
-    name,
-    phone: `09${ri(10, 99)}-${ri(100, 999)}-${ri(100, 999)}`,
-    email: `${name.toLowerCase()}${ri(10, 99)}@mail.com`,
-    companions: ri(0, 3),
-    need: pick(NEEDS),
-    staff: pick(STAFF),
-    videoId: `CAM-${ri(1, 8)}-${ri(1000, 9999)}`,
-    created: `2026/04/${String(ri(1, 22)).padStart(2, "0")}`,
-    interested,
-  };
-});
-
 // ───────────── Heatmap 點位 ─────────────
 export const heatmapPoints = [
   { x: 180, y: 160, intensity: 1.0 },
@@ -386,14 +363,6 @@ export const overviewSummary = {
       hint: "當月平均 17.9 分",
       tone: "purple" as const,
     },
-    {
-      key: "survey",
-      label: "問卷填寫人數",
-      value: "312",
-      delta: -3.2,
-      hint: "佔總人流 25.0%",
-      tone: "warning" as const,
-    },
   ],
   flow30: [
     320, 410, 380, 520, 490, 610, 580, 720, 680, 750, 820, 790, 850, 910,
@@ -424,11 +393,10 @@ export const overviewSummary = {
   ],
   genderSplit: { male: 52, female: 48 },
   topTypes: [
-    { label: "瀏覽商品", pct: 38, color: "#3b82f6" },
-    { label: "觸摸商品", pct: 24, color: "#6366f1" },
-    { label: "商談諮詢", pct: 18, color: "#8b5cf6" },
-    { label: "填寫問卷", pct: 12, color: "#a78bfa" },
-    { label: "其他", pct: 8, color: "#c4b5fd" },
+    { label: "瀏覽商品", pct: 42, color: "#3b82f6" },
+    { label: "觸摸商品", pct: 26, color: "#6366f1" },
+    { label: "商談諮詢", pct: 20, color: "#8b5cf6" },
+    { label: "其他", pct: 12, color: "#a78bfa" },
   ],
   areaTime: [
     { label: "展示區A", pct: 31, color: "#3b82f6" },
@@ -442,38 +410,11 @@ export const overviewSummary = {
     { label: "賞車行為人數", value: 842, pct: 67.5, color: "#6366f1" },
     { label: "觸摸商品人數", value: 523, pct: 41.9, color: "#8b5cf6" },
     { label: "商談/試乘人數", value: 201, pct: 16.1, color: "#a78bfa" },
-    { label: "填寫問卷人數", value: 312, pct: 25.0, color: "#f59e0b" },
   ],
   companions: [
     { label: "獨自一人", count: 412, avg: "12.4分", color: "#3b82f6" },
     { label: "2人同行", count: 389, avg: "21.8分", color: "#6366f1" },
     { label: "3人同行", count: 267, avg: "26.3分", color: "#8b5cf6" },
     { label: "4人以上", count: 179, avg: "31.7分", color: "#f59e0b" },
-  ],
-};
-
-// ───────────── 興趣評估 ─────────────
-export const surveySummary = {
-  total: 188,
-  interested: 142,
-  interestedWithView: 96,
-  preferences: [
-    { name: "M3", value: 62 },
-    { name: "i7", value: 44 },
-    { name: "X5", value: 38 },
-    { name: "M4 CS", value: 28 },
-    { name: "iX3", value: 16 },
-  ],
-  behaviorPct: [
-    { name: "駐足", filled: 82, interested: 88 },
-    { name: "觸摸商品", filled: 54, interested: 71 },
-    { name: "商談", filled: 38, interested: 62 },
-    { name: "試乘", filled: 22, interested: 41 },
-  ],
-  behaviorDur: [
-    { name: "駐足", interested: 58, all: 42 },
-    { name: "觸摸商品", interested: 28, all: 18 },
-    { name: "商談", interested: 380, all: 312 },
-    { name: "試乘", interested: 230, all: 205 },
   ],
 };

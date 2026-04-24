@@ -17,7 +17,7 @@ import { ChartContainer } from "@/components/viz/ChartContainer";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
 import { overviewSummary, stores } from "@/lib/mock";
-import { Users, TrendingUp, Timer, ClipboardList } from "lucide-react";
+import { Users, TrendingUp, Timer } from "lucide-react";
 
 const DATE_RANGES = ["今日", "本月", "自訂"] as const;
 
@@ -25,7 +25,6 @@ const KPI_ICONS: Record<string, React.ReactNode> = {
   total: <Users size={14} />,
   sales: <TrendingUp size={14} />,
   stay: <Timer size={14} />,
-  survey: <ClipboardList size={14} />,
 };
 
 export default function OverviewPage() {
@@ -76,7 +75,7 @@ export default function OverviewPage() {
       </div>
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
         {kpis.map((k) => (
           <Stat
             key={k.key}

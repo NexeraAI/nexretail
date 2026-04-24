@@ -10,9 +10,7 @@ const PAGE_LABELS: Record<string, string> = {
   "/product": "商品",
   "/customer": "顧客",
   "/entrance": "出入口",
-  "/survey": "興趣評估",
   "/stores": "店舖總覽",
-  "/survey-list": "問券列表",
 };
 
 function currentLabel(pathname: string) {
