@@ -158,12 +158,12 @@ export default function AreaPage() {
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
                       dataKey="day"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -176,7 +176,7 @@ export default function AreaPage() {
                     <Line
                       type="monotone"
                       dataKey="平均"
-                      stroke="#98a2b3"
+                      stroke="#94a3b8"
                       strokeDasharray="4 3"
                       strokeWidth={1.5}
                       dot={false}
@@ -206,7 +206,7 @@ export default function AreaPage() {
                       {demographics.gender.map((g, i) => (
                         <Cell
                           key={i}
-                          fill={i === 0 ? "#2f68ff" : "#ee5da1"}
+                          fill={i === 0 ? "#3b82f6" : "#ee5da1"}
                         />
                       ))}
                     </Pie>

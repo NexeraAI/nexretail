@@ -160,7 +160,7 @@ export default function ProductPage() {
                     <defs>
                       <linearGradient id="car" x1="0" x2="1">
                         <stop offset="0%" stopColor="#1c2030" />
-                        <stop offset="100%" stopColor="#2f68ff" />
+                        <stop offset="100%" stopColor="#3b82f6" />
                       </linearGradient>
                     </defs>
                     <rect
@@ -179,8 +179,8 @@ export default function ProductPage() {
                       rx={18}
                       fill="url(#car)"
                     />
-                    <circle cx={90} cy={130} r={14} fill="#101828" />
-                    <circle cx={230} cy={130} r={14} fill="#101828" />
+                    <circle cx={90} cy={130} r={14} fill="#1e293b" />
+                    <circle cx={230} cy={130} r={14} fill="#1e293b" />
                     <circle cx={90} cy={130} r={6} fill="#ffffff" />
                     <circle cx={230} cy={130} r={6} fill="#ffffff" />
                   </svg>
@@ -217,12 +217,12 @@ export default function ProductPage() {
                       <CartesianGrid stroke="#eef0f5" vertical={false} />
                       <XAxis
                         dataKey="age"
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                         tickFormatter={(v) => `${v}s`}
@@ -296,7 +296,7 @@ export default function ProductPage() {
                         {demographics.gender.map((_, i) => (
                           <Cell
                             key={i}
-                            fill={i === 0 ? "#2f68ff" : "#ee5da1"}
+                            fill={i === 0 ? "#3b82f6" : "#ee5da1"}
                           />
                         ))}
                       </Pie>

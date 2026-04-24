@@ -91,14 +91,14 @@ export default function SurveyPage() {
                     <CartesianGrid stroke="#eef0f5" horizontal={false} />
                     <XAxis
                       type="number"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       dataKey="name"
                       type="category"
-                      tick={{ fontSize: 12, fill: "#667085" }}
+                      tick={{ fontSize: 12, fill: "#64748b" }}
                       axisLine={false}
                       tickLine={false}
                       width={72}
@@ -131,12 +131,12 @@ export default function SurveyPage() {
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
                       dataKey="age"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -149,7 +149,7 @@ export default function SurveyPage() {
                     <Bar
                       dataKey="男性"
                       stackId="a"
-                      fill="#2f68ff"
+                      fill="#3b82f6"
                       radius={[0, 0, 0, 0]}
                     />
                     <Bar
@@ -162,7 +162,7 @@ export default function SurveyPage() {
                 </ResponsiveContainer>
               </div>
               <div className="mt-2 grid grid-cols-2 gap-3">
-                <MiniPie label="男性佔比" value={58} color="#2f68ff" />
+                <MiniPie label="男性佔比" value={58} color="#3b82f6" />
                 <MiniPie label="女性佔比" value={42} color="#ee5da1" />
               </div>
             </CardBody>
@@ -183,12 +183,12 @@ export default function SurveyPage() {
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                       tickFormatter={(v) => `${v}%`}
@@ -202,13 +202,13 @@ export default function SurveyPage() {
                     <Bar
                       dataKey="filled"
                       name="一般填券"
-                      fill="#98a2b3"
+                      fill="#94a3b8"
                       radius={[4, 4, 0, 0]}
                     />
                     <Bar
                       dataKey="interested"
                       name="感興趣族群"
-                      fill="#2f68ff"
+                      fill="#3b82f6"
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
@@ -277,7 +277,7 @@ function MiniPie({
 }) {
   const data = [
     { v: value, c: color },
-    { v: 100 - value, c: "#e5e7ef" },
+    { v: 100 - value, c: "#e2e8f0" },
   ];
   return (
     <div className="flex items-center gap-2.5 rounded-lg border border-border px-3 py-2">

@@ -21,7 +21,7 @@ export type AreaRect = {
 export type PathPoint = { x: number; y: number; label?: string };
 
 const TONE: Record<string, string> = {
-  accent: "#2f68ff",
+  accent: "#3b82f6",
   pink: "#ee5da1",
   purple: "#7a5af8",
   teal: "#15b79e",
@@ -64,8 +64,8 @@ export function TopView3D({
             />
           </pattern>
           <linearGradient id="pathGrad" x1="0" x2="1">
-            <stop offset="0%" stopColor="#2f68ff" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#2f68ff" stopOpacity="1" />
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="1" />
           </linearGradient>
         </defs>
         <rect width={width} height={height} fill="url(#grid)" />
@@ -122,7 +122,7 @@ export function TopView3D({
               cy={p.y}
               r={8}
               fill="#ffffff"
-              stroke="#2f68ff"
+              stroke="#3b82f6"
               strokeWidth={1.5}
             />
             <text
@@ -130,7 +130,7 @@ export function TopView3D({
               y={p.y + 3}
               textAnchor="middle"
               fontSize={9}
-              fill="#2f68ff"
+              fill="#3b82f6"
               fontWeight={700}
             >
               {p.label}
@@ -179,7 +179,7 @@ export function TopView3D({
                   cx={p.x}
                   cy={p.y}
                   r={i === 0 || i === path.length - 1 ? 5 : 3}
-                  fill={i === path.length - 1 ? "#f04438" : "#2f68ff"}
+                  fill={i === path.length - 1 ? "#f04438" : "#3b82f6"}
                   stroke="#ffffff"
                   strokeWidth={1.5}
                 />

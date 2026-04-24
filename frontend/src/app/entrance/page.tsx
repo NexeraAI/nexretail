@@ -185,12 +185,12 @@ export default function EntrancePage() {
                       <CartesianGrid stroke="#eef0f5" vertical={false} />
                       <XAxis
                         dataKey="date"
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
@@ -203,7 +203,7 @@ export default function EntrancePage() {
                       <Line
                         type="monotone"
                         dataKey="E1"
-                        stroke="#2f68ff"
+                        stroke="#3b82f6"
                         strokeWidth={2.2}
                         dot={false}
                       />
@@ -245,12 +245,12 @@ export default function EntrancePage() {
                       <CartesianGrid stroke="#eef0f5" vertical={false} />
                       <XAxis
                         dataKey="name"
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
-                        tick={{ fontSize: 11, fill: "#98a2b3" }}
+                        tick={{ fontSize: 11, fill: "#94a3b8" }}
                         axisLine={false}
                         tickLine={false}
                         tickFormatter={(v) => `${v}%`}
@@ -261,7 +261,7 @@ export default function EntrancePage() {
                         iconSize={8}
                         wrapperStyle={{ fontSize: 11 }}
                       />
-                      <Bar dataKey="週間" fill="#2f68ff" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="週間" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="週末" fill="#7a5af8" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>

@@ -75,17 +75,17 @@ export default function CustomerPage() {
                     <CartesianGrid stroke="#eef0f5" vertical={false} />
                     <XAxis
                       dataKey="age"
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 11, fill: "#98a2b3" }}
+                      tick={{ fontSize: 11, fill: "#94a3b8" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <Tooltip />
-                    <Bar dataKey="男性" stackId="a" fill="#2f68ff" radius={[0, 0, 0, 0]} />
+                    <Bar dataKey="男性" stackId="a" fill="#3b82f6" radius={[0, 0, 0, 0]} />
                     <Bar dataKey="女性" stackId="a" fill="#ee5da1" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>

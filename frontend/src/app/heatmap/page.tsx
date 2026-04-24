@@ -192,7 +192,7 @@ function DateRange() {
 }
 
 function Legend({ tone = "warning" as "warning" | "accent" }: { tone?: "warning" | "accent" }) {
-  const a = tone === "warning" ? "#f79009" : "#2f68ff";
+  const a = tone === "warning" ? "#f79009" : "#3b82f6";
   return (
     <div className="mt-3 flex items-center gap-3 text-xs text-muted">
       <div

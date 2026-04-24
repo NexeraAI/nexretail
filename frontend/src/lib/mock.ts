@@ -357,6 +357,101 @@ export const behaviorHeatmap = [
   { x: 160, y: 300, intensity: 0.4 },
 ];
 
+// ───────────── 商場總覽 wireframe ─────────────
+export const overviewSummary = {
+  period: "2026年4月",
+  kpis: [
+    {
+      key: "total",
+      label: "今日總人數",
+      value: "1,247",
+      delta: 5.7,
+      hint: "當月平均 1,180",
+      tone: "accent" as const,
+    },
+    {
+      key: "sales",
+      label: "今日銷售額",
+      value: "$86.4萬",
+      delta: 6.4,
+      hint: "當月平均 $81.2萬",
+      tone: "success" as const,
+    },
+    {
+      key: "stay",
+      label: "平均停留時間",
+      value: "18.3",
+      unit: "分",
+      delta: 2.1,
+      hint: "高於平均 542 人",
+      tone: "purple" as const,
+    },
+    {
+      key: "survey",
+      label: "問卷填寫人數",
+      value: "312",
+      delta: -3.2,
+      hint: "佔總人流 25.0%",
+      tone: "warning" as const,
+    },
+  ],
+  flow30: [
+    320, 410, 380, 520, 490, 610, 580, 720, 680, 750, 820, 790, 850, 910,
+    880, 920, 980, 1020, 960, 1050, 1100, 1080, 1150, 1200, 1180, 1220,
+    1300, 1250, 1320, 1400,
+  ].map((v, i) => ({ d: `04/${String(i + 1).padStart(2, "0")}`, 人流: v })),
+  flowTotals: [
+    { label: "總人流", value: "36,840", color: "#3b82f6" },
+    { label: "週間均", value: "1,082", color: "#6366f1" },
+    { label: "週末均", value: "1,418", color: "#8b5cf6" },
+  ],
+  weekFlow: [
+    { day: "一", value: 312 },
+    { day: "二", value: 278 },
+    { day: "三", value: 345 },
+    { day: "四", value: 401 },
+    { day: "五", value: 523 },
+    { day: "六", value: 687 },
+    { day: "日", value: 598 },
+  ],
+  ageGender: [
+    { age: "<18", 男性: 12, 女性: 8 },
+    { age: "18-24", 男性: 45, 女性: 38 },
+    { age: "25-34", 男性: 89, 女性: 72 },
+    { age: "35-44", 男性: 76, 女性: 68 },
+    { age: "45-54", 男性: 54, 女性: 61 },
+    { age: "55+", 男性: 32, 女性: 28 },
+  ],
+  genderSplit: { male: 52, female: 48 },
+  topTypes: [
+    { label: "瀏覽商品", pct: 38, color: "#3b82f6" },
+    { label: "觸摸商品", pct: 24, color: "#6366f1" },
+    { label: "商談諮詢", pct: 18, color: "#8b5cf6" },
+    { label: "填寫問卷", pct: 12, color: "#a78bfa" },
+    { label: "其他", pct: 8, color: "#c4b5fd" },
+  ],
+  areaTime: [
+    { label: "展示區A", pct: 31, color: "#3b82f6" },
+    { label: "展示區B", pct: 22, color: "#6366f1" },
+    { label: "商談區", pct: 20, color: "#8b5cf6" },
+    { label: "入口大廳", pct: 15, color: "#f59e0b" },
+    { label: "其他", pct: 12, color: "#e2e8f0" },
+  ],
+  funnel: [
+    { label: "進店總人流", value: 1247, pct: 100, color: "#3b82f6" },
+    { label: "賞車行為人數", value: 842, pct: 67.5, color: "#6366f1" },
+    { label: "觸摸商品人數", value: 523, pct: 41.9, color: "#8b5cf6" },
+    { label: "商談/試乘人數", value: 201, pct: 16.1, color: "#a78bfa" },
+    { label: "填寫問卷人數", value: 312, pct: 25.0, color: "#f59e0b" },
+  ],
+  companions: [
+    { label: "獨自一人", count: 412, avg: "12.4分", color: "#3b82f6" },
+    { label: "2人同行", count: 389, avg: "21.8分", color: "#6366f1" },
+    { label: "3人同行", count: 267, avg: "26.3分", color: "#8b5cf6" },
+    { label: "4人以上", count: 179, avg: "31.7分", color: "#f59e0b" },
+  ],
+};
+
 // ───────────── 興趣評估 ─────────────
 export const surveySummary = {
   total: 188,

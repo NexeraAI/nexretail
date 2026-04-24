@@ -52,9 +52,9 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d0d5dd;
+  background: #cbd5e1;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #98a2b3;
+  background: var(--muted-2);
 }

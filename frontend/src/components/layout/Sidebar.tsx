@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { stores } from "@/lib/mock";
 
 const NAV = [
   { href: "/overview", label: "商場總覽", sub: "Overview", icon: "▦" },
@@ -16,17 +17,17 @@ const NAV = [
   { href: "/survey", label: "興趣評估", sub: "Survey", icon: "◈" },
 ];
 
-const STORES = [
-  "台北信義旗艦店",
-  "台中中港店",
-  "高雄漢神店",
-  "台北內湖店",
+const ADMIN_LINKS = [
+  { href: "/stores", label: "店舖總覽" },
+  { href: "/survey-list", label: "問券列表" },
 ];
+
+const STORE_NAMES = stores.map((s) => s.name);
 
 export function Sidebar() {
   const pathname = usePathname();
   const [storeOpen, setStoreOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState(STORES[0]);
+  const [selectedStore, setSelectedStore] = useState(STORE_NAMES[0]);
 
   return (
     <aside
@@ -64,13 +65,13 @@ export function Sidebar() {
           onClick={() => setStoreOpen((v) => !v)}
           className="w-full flex items-center rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1.5 text-[12px] text-white/75 hover:bg-white/[0.08] transition"
         >
-          <span className="mr-1.5 text-[11px] opacity-60">🏪</span>
+          <span className="mr-1.5 text-[11px] opacity-60" aria-hidden>◐</span>
           <span className="flex-1 text-left truncate">{selectedStore}</span>
           <span className="text-[9px] opacity-50">{storeOpen ? "▲" : "▼"}</span>
         </button>
         {storeOpen && (
           <div className="mt-1 rounded-lg border border-white/10 bg-[#1a2535] overflow-hidden">
-            {STORES.map((s) => {
+            {STORE_NAMES.map((s) => {
               const active = s === selectedStore;
               return (
                 <button
@@ -83,7 +84,7 @@ export function Sidebar() {
                   className={cn(
                     "w-full text-left px-3 py-2 text-[11px] transition",
                     active
-                      ? "text-[#60a5fa] bg-[rgba(59,130,246,0.2)]"
+                      ? "text-accent-2 bg-accent/20"
                       : "text-white/70 hover:bg-white/[0.05]"
                   )}
                 >
@@ -149,6 +150,34 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
+
+      {/* Admin shortcuts */}
+      <div className="px-3.5 pt-3 pb-1 border-t border-white/[0.06]">
+        <div className="text-[9px] text-white/30 tracking-[0.1em] uppercase mb-1 pl-0.5">
+          管理
+        </div>
+        <ul className="flex gap-3">
+          {ADMIN_LINKS.map((it) => {
+            const active =
+              pathname === it.href || pathname.startsWith(it.href + "/");
+            return (
+              <li key={it.href}>
+                <Link
+                  href={it.href}
+                  className={cn(
+                    "text-[11px] transition",
+                    active
+                      ? "text-accent-2"
+                      : "text-white/55 hover:text-white/85"
+                  )}
+                >
+                  {it.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {/* Footer */}
       <div className="px-3.5 py-3 border-t border-white/[0.06]">
