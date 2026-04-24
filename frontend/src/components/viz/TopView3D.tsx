@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
  * products: 商品擺放
  * path: 顧客路徑 (list of [x, y])
  */
+export type Tone = "accent" | "pink" | "purple" | "teal" | "warning" | "success";
+
 export type AreaRect = {
   id: string;
   label: string;
@@ -15,17 +17,18 @@ export type AreaRect = {
   y: number;
   w: number;
   h: number;
-  tone?: "accent" | "pink" | "purple" | "teal" | "warning";
+  tone?: Tone;
 };
 
 export type PathPoint = { x: number; y: number; label?: string };
 
-const TONE: Record<string, string> = {
+const TONE: Record<Tone, string> = {
   accent: "#3b82f6",
   pink: "#ee5da1",
   purple: "#7a5af8",
   teal: "#15b79e",
   warning: "#f79009",
+  success: "#12b76a",
 };
 
 export function TopView3D({

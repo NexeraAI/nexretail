@@ -138,11 +138,11 @@ export const areaRects = [
 ];
 
 export const productMarkers = [
-  { id: "p1", x: 130, y: 130, label: "M3" },
-  { id: "p2", x: 230, y: 160, label: "i7" },
-  { id: "p3", x: 310, y: 120, label: "X5" },
-  { id: "p4", x: 440, y: 110, label: "AC" },
-  { id: "p5", x: 620, y: 140, label: "CS" },
+  { id: "p1", productId: "bmw-m3", x: 130, y: 130, label: "M3" },
+  { id: "p2", productId: "bmw-i7", x: 230, y: 160, label: "i7" },
+  { id: "p3", productId: "bmw-x5", x: 310, y: 120, label: "X5" },
+  { id: "p4", productId: "bmw-ac", x: 440, y: 110, label: "AC" },
+  { id: "p5", productId: "bmw-cs", x: 620, y: 140, label: "CS" },
 ];
 
 export const entranceMarkers = [
@@ -383,7 +383,7 @@ export const overviewSummary = {
       value: "18.3",
       unit: "分",
       delta: 2.1,
-      hint: "高於平均 542 人",
+      hint: "當月平均 17.9 分",
       tone: "purple" as const,
     },
     {

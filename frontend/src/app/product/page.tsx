@@ -145,7 +145,7 @@ export default function ProductPage() {
                   areas={areaRects}
                   products={productMarkers.map((p) => ({
                     ...p,
-                    label: p.id === selected.slice(0, 2) ? `● ${p.label}` : p.label,
+                    label: p.productId === selected ? `● ${p.label}` : p.label,
                   }))}
                   height={260}
                 />
