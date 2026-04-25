@@ -97,3 +97,120 @@ export type StoreOverview = {
 
 export const getStoreOverview = (storeId: number) =>
   get<StoreOverview>(`/stores/${storeId}/overview`);
+
+// ───────────── store layout ─────────────
+
+export type LayoutArea = {
+  id: number;
+  code: string;
+  name: string;
+  type: string;
+  polygon: { rect?: [number, number, number, number]; points?: [number, number][] } | null;
+  color: string | null;
+  today_count: number;
+  month_avg: number;
+};
+
+export type LayoutEntrance = {
+  id: number;
+  code: string;
+  name: string;
+  type: string;
+  position_x: number;
+  position_y: number;
+  today_count: number;
+  conversion_rate: number;
+};
+
+export type LayoutProduct = {
+  id: number;
+  sku: string;
+  name: string;
+  model: string | null;
+  category: string | null;
+  image_url: string | null;
+  area_id: number | null;
+  placement_x: number;
+  placement_y: number;
+  avg_view_seconds: number;
+  interaction_count: number;
+};
+
+export type StoreLayout = {
+  store: Store;
+  areas: LayoutArea[];
+  entrances: LayoutEntrance[];
+  products: LayoutProduct[];
+};
+
+export const getStoreLayout = (storeId: number) =>
+  get<StoreLayout>(`/stores/${storeId}/layout`);
+
+// ───────────── visitors ─────────────
+
+export type Page<T> = {
+  data: T[];
+  page: number;
+  size: number;
+  total: number;
+  has_more: boolean;
+};
+
+export type VisitorSummary = {
+  id: number;
+  anon_id: string;
+  gender: "M" | "F" | "U";
+  age_group: string;
+  entered_at: string;
+  exited_at: string | null;
+  stay_seconds: number;
+  companion_count: number;
+  status: "active" | "left";
+  interested_flag: boolean;
+  thumbnail_url: string | null;
+};
+
+export type EntranceRef = { id: number; code: string; name: string };
+
+export type VisitorDetail = VisitorSummary & {
+  full_body_url: string | null;
+  entrance: EntranceRef | null;
+};
+
+export type VisitorPathPoint = { t: string; x: number; y: number };
+export type VisitorPath = { session_id: number; points: VisitorPathPoint[] };
+
+export type AreaDwell = { area_id: number; area_name: string; dwell_seconds: number };
+
+export type BehaviorEvent = {
+  id: number;
+  behavior_type: string;
+  area_id: number | null;
+  product_id: number | null;
+  started_at: string;
+  duration_seconds: number;
+};
+
+export type VisitorListOpts = {
+  date?: "today" | "month";
+  status?: "active";
+  size?: number;
+};
+
+export const listVisitors = (storeId: number, opts: VisitorListOpts = {}) => {
+  const q = new URLSearchParams({ storeId: String(storeId) });
+  if (opts.date) q.set("date", opts.date);
+  if (opts.status) q.set("status", opts.status);
+  if (opts.size) q.set("size", String(opts.size));
+  return get<Page<VisitorSummary>>(`/visitors?${q.toString()}`);
+};
+
+export const getVisitor = (vid: number) => get<VisitorDetail>(`/visitors/${vid}`);
+
+export const getVisitorPath = (vid: number) => get<VisitorPath>(`/visitors/${vid}/path`);
+
+export const getVisitorAreaDwell = (vid: number) =>
+  get<AreaDwell[]>(`/visitors/${vid}/area-dwell`);
+
+export const getVisitorBehaviors = (vid: number) =>
+  get<BehaviorEvent[]>(`/visitors/${vid}/behaviors`);
