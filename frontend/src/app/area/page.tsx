@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ComposedChart,
   Bar,
@@ -19,21 +19,154 @@ import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 import { Stat } from "@/components/ui/Stat";
-import { TopView3D } from "@/components/viz/TopView3D";
+import { TopView3D, type AreaRect, type Tone } from "@/components/viz/TopView3D";
 import {
-  areas,
-  areaRects,
-  productMarkers,
-  customers,
-  weeklyTraffic,
-  demographics,
-} from "@/lib/mock";
+  ApiError,
+  getStoreLayout,
+  getStoreOverview,
+  listVisitors,
+  type StoreLayout,
+  type StoreOverview,
+  type VisitorSummary,
+} from "@/lib/api";
 import { fmt } from "@/lib/utils";
 import { Users, Clock, Activity, Play } from "lucide-react";
 
+const STORE_ID = 1;
+
+const TONE_ORDER: Tone[] = ["accent", "pink", "purple", "warning", "teal", "success"];
+const WEEKDAY_LABELS = ["週一", "週二", "週三", "週四", "週五", "週六", "週日"];
+
+function genderShort(g: "M" | "F" | "U"): "m" | "f" {
+  return g === "F" ? "f" : "m";
+}
+function nameOf(v: { id: number }) {
+  return `訪客 #${v.id}`;
+}
+function tsHHMM(iso: string) {
+  return iso.slice(11, 16);
+}
+
 export default function AreaPage() {
-  const [selected, setSelected] = useState(areas[0].id);
-  const area = areas.find((a) => a.id === selected)!;
+  const [layout, setLayout] = useState<StoreLayout | null>(null);
+  const [overview, setOverview] = useState<StoreOverview | null>(null);
+  const [visitors, setVisitors] = useState<VisitorSummary[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      getStoreLayout(STORE_ID),
+      getStoreOverview(STORE_ID),
+      listVisitors(STORE_ID, { date: "month", size: 24 }),
+    ])
+      .then(([lay, ov, page]) => {
+        if (cancelled) return;
+        setLayout(lay);
+        setOverview(ov);
+        setVisitors(page.data);
+        if (lay.areas.length > 0) setSelected(lay.areas[0].id);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        console.error(e);
+        setError(e instanceof ApiError ? e.message : "未預期錯誤");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (error) {
+    return <div className="p-6 text-sm text-danger">無法載入區域資料：{error}</div>;
+  }
+  if (!layout || !overview || !visitors || selected == null) {
+    return <div className="p-6 text-sm text-muted">載入中…</div>;
+  }
+
+  const areasIndexed = layout.areas.map((a, i) => ({
+    ...a,
+    tone: TONE_ORDER[i % TONE_ORDER.length],
+  }));
+  const areaIdx = Math.max(
+    0,
+    areasIndexed.findIndex((a) => a.id === selected),
+  );
+  const area = areasIndexed[areaIdx];
+
+  const areaRects: AreaRect[] = areasIndexed
+    .filter((a) => a.polygon?.rect)
+    .map((a) => {
+      const [x, y, w, h] = a.polygon!.rect!;
+      return { id: String(a.id), label: a.name, x, y, w, h, tone: a.tone };
+    });
+
+  const productMarkers = layout.products.map((p) => ({
+    id: String(p.id),
+    x: p.placement_x,
+    y: p.placement_y,
+    label: p.model ?? p.sku,
+  }));
+
+  const totalVisitors = overview.kpi.total_visitors;
+  const areaTimeRow = overview.area_time.find((r) => r.area_id === area.id);
+  const avgStay =
+    areaTimeRow && totalVisitors > 0
+      ? Math.round(areaTimeRow.seconds / totalVisitors)
+      : null;
+
+  const ageGenderTotal = overview.age_gender.reduce(
+    (sum, r) => sum + r.male + r.female,
+    0,
+  );
+  let topCombo = { label: "—", count: 0 };
+  for (const r of overview.age_gender) {
+    if (r.male > topCombo.count) topCombo = { label: `男 ${r.age_group}`, count: r.male };
+    if (r.female > topCombo.count)
+      topCombo = { label: `女 ${r.age_group}`, count: r.female };
+  }
+  const topComboPct = ageGenderTotal
+    ? Math.round((topCombo.count / ageGenderTotal) * 100)
+    : 0;
+
+  const ageMax = overview.age_gender.reduce(
+    (m, r) => {
+      const total = r.male + r.female;
+      return total > m.total ? { age: r.age_group, total } : m;
+    },
+    { age: "—", total: 0 },
+  );
+  const ageMaxPct = ageGenderTotal
+    ? Math.round((ageMax.total / ageGenderTotal) * 100)
+    : 0;
+
+  const weeklyAvg =
+    overview.week_flow.length === 0
+      ? 0
+      : Math.round(
+          overview.week_flow.reduce((s, w) => s + w.visitors, 0) /
+            overview.week_flow.length,
+        );
+  const weeklyTraffic = WEEKDAY_LABELS.map((label, i) => {
+    const row = overview.week_flow.find((w) => w.weekday === i);
+    return { day: label, 人流: row?.visitors ?? 0, 平均: weeklyAvg };
+  });
+
+  const genderPie = [
+    { name: "男性", value: overview.gender_split.male_pct },
+    { name: "女性", value: overview.gender_split.female_pct },
+  ];
+
+  const companionsTotal = overview.companions.reduce((s, c) => s + c.count, 0);
+  const companions2Plus = overview.companions
+    .filter((c) => c.label !== "獨自一人")
+    .reduce((s, c) => s + c.count, 0);
+  const companionsPct = companionsTotal
+    ? Math.round((companions2Plus / companionsTotal) * 100)
+    : 0;
+
+  const visibleVisitors = visitors.slice(0, 12);
 
   return (
     <>
@@ -49,7 +182,7 @@ export default function AreaPage() {
           <CardHeader title="區域列表" desc="點擊切換" />
           <CardBody className="px-2 pb-2">
             <ul className="space-y-1">
-              {areas.map((a) => {
+              {areasIndexed.map((a) => {
                 const act = a.id === selected;
                 return (
                   <li key={a.id}>
@@ -65,16 +198,14 @@ export default function AreaPage() {
                       <div className="flex items-center gap-2">
                         <span
                           className="w-2.5 h-2.5 rounded-sm"
-                          style={{
-                            background: `var(--color-${a.tone})`,
-                          }}
+                          style={{ background: `var(--color-${a.tone})` }}
                         />
                         <div className="text-left">
                           <div className="text-sm font-medium">{a.name}</div>
                           <div className="text-xs text-muted">{a.type}區</div>
                         </div>
                       </div>
-                      <Badge tone={a.tone}>{fmt(a.count)}</Badge>
+                      <Badge tone={a.tone}>{fmt(a.today_count)}</Badge>
                     </button>
                   </li>
                 );
@@ -89,7 +220,7 @@ export default function AreaPage() {
             <Card>
               <CardHeader
                 title="即時影像"
-                desc={`${area.name} · CAM-0${(areas.findIndex((a) => a.id === area.id) % 4) + 1}`}
+                desc={`${area.name} · CAM-0${(areaIdx % 4) + 1}`}
                 action={<Badge tone="danger">● LIVE</Badge>}
               />
               <CardBody>
@@ -112,7 +243,7 @@ export default function AreaPage() {
                 <TopView3D
                   areas={areaRects}
                   products={productMarkers}
-                  highlightId={area.id}
+                  highlightId={String(area.id)}
                   height={260}
                 />
               </CardBody>
@@ -122,35 +253,33 @@ export default function AreaPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Stat
               label="今日總人數"
-              value={fmt(area.count)}
+              value={fmt(area.today_count)}
               tone="accent"
               icon={<Users size={14} />}
             />
             <Stat
-              label="平均停留"
-              value={`${area.stay}s`}
+              label="人均區內秒數"
+              value={avgStay == null ? "—" : `${avgStay}s`}
               tone="default"
               icon={<Clock size={14} />}
+              hint="全店人均"
             />
             <Stat
               label="前 25% 停留"
-              value={`${Math.round(area.stay * 1.8)}s`}
+              value={avgStay == null ? "—" : `${Math.round(avgStay * 1.8)}s`}
               tone="success"
               icon={<Activity size={14} />}
             />
             <Stat
               label="最多類型"
-              value="男 35-44"
+              value={topCombo.label}
               tone="warning"
-              hint="佔 28%"
+              hint={`佔 ${topComboPct}%`}
             />
           </div>
 
           <Card>
-            <CardHeader
-              title="一週每小時人流密度"
-              desc="數值越高 → 越擁擠"
-            />
+            <CardHeader title="一週每小時人流密度" desc="數值越高 → 越擁擠" />
             <CardBody>
               <div className="h-52">
                 <ChartContainer width="100%" height="100%">
@@ -197,17 +326,14 @@ export default function AreaPage() {
                 <ChartContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={demographics.gender}
+                      data={genderPie}
                       dataKey="value"
                       innerRadius={40}
                       outerRadius={64}
                       paddingAngle={2}
                     >
-                      {demographics.gender.map((g, i) => (
-                        <Cell
-                          key={i}
-                          fill={i === 0 ? "#3b82f6" : "#ee5da1"}
-                        />
+                      {genderPie.map((_, i) => (
+                        <Cell key={i} fill={i === 0 ? "#3b82f6" : "#ee5da1"} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -217,21 +343,23 @@ export default function AreaPage() {
               <div className="flex items-center justify-between text-xs">
                 <span>
                   <span className="inline-block w-2 h-2 rounded-full bg-accent mr-1.5" />
-                  男性 58%
+                  男性 {overview.gender_split.male_pct}%
                 </span>
                 <span>
                   <span className="inline-block w-2 h-2 rounded-full bg-pink mr-1.5" />
-                  女性 42%
+                  女性 {overview.gender_split.female_pct}%
                 </span>
               </div>
               <div className="mt-3 pt-3 border-t border-border space-y-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-muted">攜伴比例</span>
-                  <span>62% (2 人以上)</span>
+                  <span>{companionsPct}% (2 人以上)</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted">年齡最多</span>
-                  <span>35-44 (32%)</span>
+                  <span>
+                    {ageMax.age} ({ageMaxPct}%)
+                  </span>
                 </div>
               </div>
             </CardBody>
@@ -239,25 +367,25 @@ export default function AreaPage() {
 
           <Card>
             <CardHeader
-              title="停留顧客"
-              desc={`${customers.length} 位 · 本區`}
+              title="全店訪客"
+              desc={`${visibleVisitors.length} 位`}
             />
             <CardBody className="px-0 pb-0">
               <ul className="divide-y divide-border max-h-[360px] overflow-y-auto">
-                {customers.slice(0, 12).map((c) => (
+                {visibleVisitors.map((c) => (
                   <li
                     key={c.id}
                     className="flex items-center gap-3 px-5 py-2.5 hover:bg-surface-2"
                   >
-                    <Avatar name={c.name} gender={c.gender} size={32} />
+                    <Avatar name={nameOf(c)} gender={genderShort(c.gender)} size={32} />
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm truncate">{c.name}</div>
+                      <div className="text-sm truncate">{nameOf(c)}</div>
                       <div className="text-[11px] text-muted">
-                        {c.entered.slice(-5)} · {c.age}
+                        {tsHHMM(c.entered_at)} · {c.age_group}
                       </div>
                     </div>
                     <span className="text-[11px] tabular-nums text-muted">
-                      {Math.round(c.stay / 60)}m
+                      {Math.round(c.stay_seconds / 60)}m
                     </span>
                   </li>
                 ))}
