@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -16,40 +17,139 @@ import {
 import { ChartContainer } from "@/components/viz/ChartContainer";
 import { Card, CardHeader, CardBody } from "@/components/ui/Card";
 import { Stat } from "@/components/ui/Stat";
-import { overviewSummary, stores } from "@/lib/mock";
+import {
+  ApiError,
+  getStore,
+  getStoreOverview,
+  type Store,
+  type StoreOverview,
+} from "@/lib/api";
 import { Users, TrendingUp, Timer } from "lucide-react";
 
+const STORE_ID = 1;
 const DATE_RANGES = ["今日", "本月", "自訂"] as const;
+const PALETTE = ["#3b82f6", "#6366f1", "#8b5cf6", "#a78bfa", "#f59e0b", "#e2e8f0"];
+const WEEKDAY_LABELS = ["一", "二", "三", "四", "五", "六", "日"];
 
-const KPI_ICONS: Record<string, React.ReactNode> = {
-  total: <Users size={14} />,
-  sales: <TrendingUp size={14} />,
-  stay: <Timer size={14} />,
+const BEHAVIOR_LABELS: Record<string, string> = {
+  browse: "瀏覽 / 駐足",
+  touch: "觸摸商品",
+  talk: "商談諮詢",
+  test_ride: "試乘 / 試坐",
+  qr_scan: "掃 QR",
 };
 
+function fmt(n: number) {
+  return n.toLocaleString("en-US");
+}
+
 export default function OverviewPage() {
-  const {
-    period,
-    kpis,
-    flow30,
-    flowTotals,
-    weekFlow,
-    ageGender,
-    genderSplit,
-    topTypes,
-    areaTime,
-    funnel,
-    companions,
-  } = overviewSummary;
+  const [store, setStore] = useState<Store | null>(null);
+  const [data, setData] = useState<StoreOverview | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    Promise.all([getStore(STORE_ID), getStoreOverview(STORE_ID)])
+      .then(([s, d]) => {
+        setStore(s);
+        setData(d);
+      })
+      .catch((e) => {
+        console.error(e);
+        setError(e instanceof ApiError ? e.message : "未預期錯誤");
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <div className="p-6 text-sm text-danger">
+        無法載入 overview：{error}
+      </div>
+    );
+  }
+  if (!data || !store) {
+    return <div className="p-6 text-sm text-muted">載入中…</div>;
+  }
+
+  const flow30 = data.flow_30d.map((p) => ({ d: p.date, 人流: p.visitors }));
+  const flowTotal = data.flow_30d.reduce((a, b) => a + b.visitors, 0);
+  const weekFlow = data.week_flow.map((w) => ({
+    day: WEEKDAY_LABELS[w.weekday],
+    value: w.visitors,
+  }));
+  const weekdayAvg = average(
+    data.week_flow.filter((w) => w.weekday < 5).map((w) => w.visitors),
+  );
+  const weekendAvg = average(
+    data.week_flow.filter((w) => w.weekday >= 5).map((w) => w.visitors),
+  );
+  const flowTotals = [
+    { label: "近 30 天總人流", value: fmt(flowTotal), color: PALETTE[0] },
+    { label: "週間日均", value: fmt(weekdayAvg), color: PALETTE[1] },
+    { label: "週末日均", value: fmt(weekendAvg), color: PALETTE[2] },
+  ];
+
+  const ageGender = data.age_gender.map((r) => ({
+    age: r.age_group,
+    男性: r.male,
+    女性: r.female,
+  }));
+  const topTypes = data.top_behaviors.map((b, i) => ({
+    label: BEHAVIOR_LABELS[b.behavior_type] ?? b.behavior_type,
+    pct: b.pct,
+    color: PALETTE[i % PALETTE.length],
+  }));
+  const areaTime = data.area_time.map((a, i) => ({
+    label: a.area_name,
+    pct: a.pct,
+    color: PALETTE[i % PALETTE.length],
+  }));
+  const funnel = data.funnel.map((f, i) => ({
+    label: f.label,
+    value: f.value,
+    pct: f.pct,
+    color: PALETTE[i % PALETTE.length],
+  }));
+  const companions = data.companions.map((c, i) => ({
+    label: c.label,
+    count: c.count,
+    avg: `${Math.round(c.avg_stay_seconds / 60)}分`,
+    color: PALETTE[i % PALETTE.length],
+  }));
+
+  const kpis = [
+    {
+      key: "total",
+      label: "近 30 天總人流",
+      value: fmt(data.kpi.total_visitors),
+      tone: "accent" as const,
+      icon: <Users size={14} />,
+    },
+    {
+      key: "sales",
+      label: "近 30 天銷售額",
+      value: data.kpi.sales !== null ? fmt(data.kpi.sales) : "—",
+      tone: "success" as const,
+      icon: <TrendingUp size={14} />,
+      hint: data.kpi.sales === null ? "尚無銷售資料" : undefined,
+    },
+    {
+      key: "stay",
+      label: "平均停留時間",
+      value: (data.kpi.avg_stay_seconds / 60).toFixed(1),
+      unit: "分",
+      tone: "purple" as const,
+      icon: <Timer size={14} />,
+    },
+  ];
 
   return (
     <div className="p-6">
-      {/* Title + date range */}
       <div className="flex items-start justify-between mb-5">
         <div>
           <div className="text-[20px] font-bold text-foreground">商場總覽</div>
           <div className="text-[12px] text-muted-2 mt-1">
-            {stores[0].name} · {period}
+            {store.name} · {data.period}
           </div>
         </div>
         <div className="flex gap-2">
@@ -74,7 +174,6 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
         {kpis.map((k) => (
           <Stat
@@ -82,18 +181,16 @@ export default function OverviewPage() {
             label={k.label}
             value={k.value}
             unit={k.unit}
-            delta={k.delta}
             tone={k.tone}
-            icon={KPI_ICONS[k.key]}
+            icon={k.icon}
             hint={k.hint}
           />
         ))}
       </div>
 
-      {/* Row 1: daily flow + weekly flow */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <Card className="lg:col-span-2">
-          <CardHeader title="每日人流趨勢" desc="本月每日進店總人數" />
+          <CardHeader title="每日人流趨勢" desc="近 30 天每日進店總人數" />
           <CardBody>
             <div className="h-40">
               <ChartContainer>
@@ -175,7 +272,6 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Row 2: gender-age + behavior donut + area donut */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <Card>
           <CardHeader title="性別與年齡分佈" />
@@ -187,7 +283,7 @@ export default function OverviewPage() {
                   className="text-xl font-bold"
                   style={{ color: "#3b82f6" }}
                 >
-                  {genderSplit.male}%
+                  {data.gender_split.male_pct}%
                 </div>
               </div>
               <div className="w-px h-8 bg-border" />
@@ -197,7 +293,7 @@ export default function OverviewPage() {
                   className="text-xl font-bold"
                   style={{ color: "#f472b6" }}
                 >
-                  {genderSplit.female}%
+                  {data.gender_split.female_pct}%
                 </div>
               </div>
             </div>
@@ -320,7 +416,6 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Row 3: funnel + companion */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader title="顧客行為漏斗" />
@@ -389,4 +484,9 @@ export default function OverviewPage() {
       </div>
     </div>
   );
+}
+
+function average(xs: number[]): number {
+  if (xs.length === 0) return 0;
+  return Math.round(xs.reduce((a, b) => a + b, 0) / xs.length);
 }
