@@ -384,7 +384,11 @@ def _query_funnel(
 def _query_companions(
     db: Session, store_id: int, since: datetime
 ) -> list[CompanionRowOut]:
-    """同行人數分桶（0/1/2/3+）+ 每桶平均停留秒數。"""
+    """
+    同行人數（額外同行，不含本人）分桶 + 每桶平均停留秒數。
+
+    cc=0 → 獨自一人；cc=1 → 2 人同行；cc=2 → 3 人同行；cc>=3 → 4 人以上。
+    """
     rows = db.execute(
         select(
             VisitorSession.companion_count,

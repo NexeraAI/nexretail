@@ -27,6 +27,10 @@ export default function StoresPage() {
       });
   }, []);
 
+  if (error) {
+    return <div className="p-6 text-sm text-danger">無法載入 stores：{error}</div>;
+  }
+
   const filtered = stores
     .filter((s) => s.country_code === country)
     .filter(
@@ -52,10 +56,7 @@ export default function StoresPage() {
         <Card className="col-span-12 lg:col-span-4">
           <CardHeader title="國家" desc="點選查看該國所有店鋪" />
           <CardBody className="pt-1">
-            {error && (
-              <div className="px-3 py-3 text-xs text-danger">無法載入：{error}</div>
-            )}
-            {!error && countries.length === 0 && (
+            {countries.length === 0 && (
               <div className="px-3 py-3 text-xs text-muted">載入中…</div>
             )}
             <ul className="divide-y divide-border">
@@ -154,7 +155,7 @@ export default function StoresPage() {
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && !error && countries.length > 0 && (
+                {filtered.length === 0 && countries.length > 0 && (
                   <tr>
                     <td colSpan={4} className="px-5 py-12 text-center text-muted">
                       無資料

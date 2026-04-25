@@ -53,8 +53,6 @@ class OverviewKpiOut(BaseModel):
 
 
 class FlowPointOut(BaseModel):
-    """30 天每日人流。"""
-
     date: str
     visitors: int
 
@@ -67,31 +65,23 @@ class WeekFlowOut(BaseModel):
 
 
 class AgeGenderRowOut(BaseModel):
-    """age_group × gender 的人數矩陣，一個 age_group 一筆。"""
-
     age_group: str
     male: int
     female: int
 
 
 class GenderSplitOut(BaseModel):
-    """男 / 女佔比百分比（0–100）。"""
-
     male_pct: float
     female_pct: float
 
 
 class BehaviorTypeRowOut(BaseModel):
-    """top behavior_type 佔比；pct 是百分比。"""
-
     behavior_type: str
     count: int
     pct: float
 
 
 class AreaTimeRowOut(BaseModel):
-    """各區域累計停留秒數佔比。"""
-
     area_id: int
     area_name: str
     seconds: int
@@ -99,16 +89,12 @@ class AreaTimeRowOut(BaseModel):
 
 
 class FunnelRowOut(BaseModel):
-    """進店 → 賞車 → 觸摸 → 商談/試乘 漏斗一層。"""
-
     label: str
     value: int
     pct: float
 
 
 class CompanionRowOut(BaseModel):
-    """同行人數分桶 + 平均停留。"""
-
     label: str
     count: int
     avg_stay_seconds: int
