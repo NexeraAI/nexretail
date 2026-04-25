@@ -359,9 +359,10 @@ def _query_funnel(
             )
         ) or 0
 
-    # 每層集合是後一層的超集
+    # 賞車及更深 ⊇ 觸摸及更深 ⊇ 商談/試乘。
+    # QR_SCAN 是平行的低投入訊號（掃 QR ≠ 在現場賞車），不算 funnel 階段。
     browse_or_deeper = _distinct_session_count(
-        [BEHAVIOR_BROWSE, BEHAVIOR_QR_SCAN, BEHAVIOR_TOUCH, BEHAVIOR_TALK, BEHAVIOR_TEST_RIDE]
+        [BEHAVIOR_BROWSE, BEHAVIOR_TOUCH, BEHAVIOR_TALK, BEHAVIOR_TEST_RIDE]
     )
     touch_or_deeper = _distinct_session_count(
         [BEHAVIOR_TOUCH, BEHAVIOR_TALK, BEHAVIOR_TEST_RIDE]
