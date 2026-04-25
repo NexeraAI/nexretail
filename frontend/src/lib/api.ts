@@ -146,6 +146,36 @@ export type StoreLayout = {
 export const getStoreLayout = (storeId: number) =>
   get<StoreLayout>(`/stores/${storeId}/layout`);
 
+// ───────────── product insights ─────────────
+
+export type ProductInsightAgeRow = {
+  age_group: string;
+  male: number;
+  female: number;
+};
+
+export type ProductInsightVisitor = {
+  id: number;
+  gender: "M" | "F" | "U";
+  age_group: string;
+  entered_at: string;
+  stay_seconds: number;
+};
+
+export type ProductInsight = {
+  interaction_visitors: number;
+  total_seconds: number;
+  avg_view_seconds: number;
+  top_age_group: string | null;
+  age_gender: ProductInsightAgeRow[];
+  gender_split: GenderSplit;
+  behaviors: BehaviorTypeRow[];
+  visitors: ProductInsightVisitor[];
+};
+
+export const getProductInsights = (productId: number) =>
+  get<ProductInsight>(`/products/${productId}/insights`);
+
 // ───────────── visitors ─────────────
 
 export type Page<T> = {
