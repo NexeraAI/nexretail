@@ -6,12 +6,11 @@ STATUS_LEFT = "left"        # 已離店
 
 VISITOR_STATUSES = [STATUS_ACTIVE, STATUS_LEFT]
 
-# 性別；U 代表辨識不出來
+# 性別只記錄 M / F；辨識不出來的 session 不入庫
 GENDER_MALE = "M"
 GENDER_FEMALE = "F"
-GENDER_UNKNOWN = "U"
 
-GENDERS = [GENDER_MALE, GENDER_FEMALE, GENDER_UNKNOWN]
+GENDERS = [GENDER_MALE, GENDER_FEMALE]
 
 # 年齡分組（與前端 demographics 圖表一致）
 AGE_GROUPS = ["18-24", "25-34", "35-44", "45-54", "55+"]
