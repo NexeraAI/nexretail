@@ -17,8 +17,7 @@ from app.behavior_events.const import (
 from app.behavior_events.model import BehaviorEvent
 from app.entrances.model import Entrance
 from app.entrances.schema import EntranceOut
-from app.products.model import Product
-from app.products.schema import ProductOut
+from app.products.service import ProductsService
 from app.stores.const import COUNTRY_NAMES
 from app.stores.model import Store
 from app.stores.schema import (
@@ -122,12 +121,11 @@ class StoresService:
             select(Area).where(Area.store_id == store_id).order_by(Area.display_order, Area.id)
         ).all()
         entrances = db.scalars(select(Entrance).where(Entrance.store_id == store_id)).all()
-        products = db.scalars(select(Product).where(Product.store_id == store_id)).all()
         return StoreLayoutOut(
             store=_to_out(s),
             areas=[AreaOut.model_validate(a) for a in areas],
             entrances=[EntranceOut.model_validate(e) for e in entrances],
-            products=[ProductOut.model_validate(p) for p in products],
+            products=ProductsService.list_products(db, store_id),
         )
 
     @staticmethod
