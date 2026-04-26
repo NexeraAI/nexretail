@@ -1,5 +1,7 @@
 """entrances API 回應 schema。"""
 
+from pydantic import BaseModel
+
 from app.common.schema import OrmModel
 
 
@@ -19,3 +21,32 @@ class EntranceOut(OrmModel):
     position_y: float
     today_count: int = 0
     conversion_rate: float = 0.0
+
+
+class EntranceMetricsOut(EntranceOut):
+    """
+    單口近 30 天指標 — entrance 頁的 KPI 與長條圖直接讀。
+
+    繼承 `EntranceOut` 的基本欄位（含 today_count / conversion_rate），
+    避免兩 schema 漂移；只額外加 weekday/weekend 拆分。
+    """
+
+    weekday_avg: int
+    weekend_avg: int
+    weekday_conv: float
+    weekend_conv: float
+
+
+class EntranceDailyPointOut(BaseModel):
+    """30 天每日 series 的一個點;`counts` 以 entrance code 為 key。"""
+
+    date: str
+    counts: dict[str, int]
+
+
+class EntranceInsightsOut(BaseModel):
+    """`/stores/{id}/entrances/insights` 聚合回應。"""
+
+    period: str
+    entrances: list[EntranceMetricsOut]
+    daily_series: list[EntranceDailyPointOut]

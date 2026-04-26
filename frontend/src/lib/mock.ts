@@ -144,12 +144,6 @@ export const productMarkers = [
   { id: "p5", productId: "bmw-cs", x: 620, y: 140, label: "CS" },
 ];
 
-export const entranceMarkers = [
-  { x: 40, y: 420 - 40, label: "E1" },
-  { x: 720 - 40, y: 420 - 40, label: "E2" },
-  { x: 360, y: 20, label: "E3" },
-];
-
 export const customerPath = [
   { x: 40, y: 380 },
   { x: 120, y: 320 },
@@ -249,47 +243,6 @@ export const products = [
     dwell: 232,
   },
 ];
-
-// ───────────── 出入口 ─────────────
-export const entrances = [
-  {
-    id: "e1",
-    name: "E1 — 大門正入口",
-    today: 1820,
-    weekdayAvg: 1310,
-    weekendAvg: 1820,
-    conv: 0.21,
-    weekdayConv: 0.18,
-    weekendConv: 0.26,
-  },
-  {
-    id: "e2",
-    name: "E2 — 停車場直達",
-    today: 950,
-    weekdayAvg: 720,
-    weekendAvg: 1120,
-    conv: 0.32,
-    weekdayConv: 0.29,
-    weekendConv: 0.38,
-  },
-  {
-    id: "e3",
-    name: "E3 — 後門商談",
-    today: 240,
-    weekdayAvg: 200,
-    weekendAvg: 180,
-    conv: 0.62,
-    weekdayConv: 0.55,
-    weekendConv: 0.68,
-  },
-];
-
-export const entranceSeries = Array.from({ length: 30 }).map((_, d) => ({
-  date: `04/${String(d + 1).padStart(2, "0")}`,
-  E1: ri(400, 900),
-  E2: ri(250, 600),
-  E3: ri(80, 200),
-}));
 
 // ───────────── 性別 / 年齡 ─────────────
 export const demographics = {

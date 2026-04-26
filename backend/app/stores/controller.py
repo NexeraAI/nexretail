@@ -1,8 +1,10 @@
-"""stores HTTP 端點 — /stores, /stores/countries, /stores/{id}, /stores/{id}/layout, /stores/{id}/overview。"""
+"""stores HTTP 端點 — /stores, /stores/countries, /stores/{id}, /stores/{id}/layout, /stores/{id}/overview, /stores/{id}/entrances/insights。"""
 
 from fastapi import APIRouter, HTTPException
 
 from app.deps import DbSession
+from app.entrances.schema import EntranceInsightsOut
+from app.entrances.service import EntrancesService
 from app.stores.schema import (
     CountryOut,
     StoreLayoutOut,
@@ -49,6 +51,15 @@ def get_layout(store_id: int, db: DbSession) -> StoreLayoutOut:
 def get_overview(store_id: int, db: DbSession) -> StoreOverviewOut:
     """取單店近 30 天 overview 聚合（KPI、flow、漏斗、各圖表）；找不到回 404。"""
     out = StoresService.get_overview(db, store_id)
+    if out is None:
+        raise HTTPException(404, {"code": "not_found", "message": "Store not found"})
+    return out
+
+
+@router.get("/{store_id}/entrances/insights", response_model=EntranceInsightsOut)
+def get_entrance_insights(store_id: int, db: DbSession) -> EntranceInsightsOut:
+    """取單店近 30 天每入口聚合（每口指標 + 30 天 daily series）；找不到回 404。"""
+    out = EntrancesService.get_insights(db, store_id)
     if out is None:
         raise HTTPException(404, {"code": "not_found", "message": "Store not found"})
     return out
