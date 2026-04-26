@@ -80,11 +80,14 @@ class EntrancesService:
         if db.get(Store, store_id) is None:
             return None
 
-        now = datetime.now(UTC)
+        # 30 天視窗對齊：含今日，往前回推 29 天。讓資料窗 (entered_at >= since)
+        # 與分母 (range(30)) / daily_series 桶 (start_date..start_date+29) 同口徑，
+        # 否則今天的 sessions 會進 avg 分子卻無對應分母 / 不在 series 桶裡。
+        today_naive = datetime.now(UTC).date()
         # SQLite 不保留 tz，回讀的 entered_at 是 naive；Python 端比較用 naive 邊界。
-        today_start_naive = datetime.combine(now.date(), time.min)
-        since = now - timedelta(days=30)
-        start_date = since.date()
+        today_start_naive = datetime.combine(today_naive, time.min)
+        start_date = today_naive - timedelta(days=29)
+        since = datetime.combine(start_date, time.min, tzinfo=UTC)
 
         entrances = db.scalars(
             select(Entrance).where(Entrance.store_id == store_id).order_by(Entrance.code)

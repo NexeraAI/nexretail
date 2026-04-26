@@ -23,19 +23,16 @@ class EntranceOut(OrmModel):
     conversion_rate: float = 0.0
 
 
-class EntranceMetricsOut(BaseModel):
-    """單口近 30 天指標 — entrance 頁的 KPI 與長條圖直接讀。"""
+class EntranceMetricsOut(EntranceOut):
+    """
+    單口近 30 天指標 — entrance 頁的 KPI 與長條圖直接讀。
 
-    id: int
-    code: str
-    name: str
-    type: str
-    position_x: float
-    position_y: float
-    today_count: int
+    繼承 `EntranceOut` 的基本欄位（含 today_count / conversion_rate），
+    避免兩 schema 漂移；只額外加 weekday/weekend 拆分。
+    """
+
     weekday_avg: int
     weekend_avg: int
-    conversion_rate: float
     weekday_conv: float
     weekend_conv: float
 

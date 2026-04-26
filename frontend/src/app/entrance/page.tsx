@@ -90,13 +90,11 @@ export default function EntrancePage() {
     label: e.code,
   }));
 
-  // 折線圖：取最近 14 天，rechart row 用 entrance code 為 dataKey
   const lineData = insights.daily_series.slice(-14).map((p) => ({
     date: p.date,
     ...p.counts,
   }));
 
-  // 「入口總數」卡片：30 天總和、週間/週末日均
   const totals = insights.entrances.reduce(
     (acc, e) => ({
       weekday: acc.weekday + e.weekday_avg,
