@@ -146,6 +146,37 @@ export type StoreLayout = {
 export const getStoreLayout = (storeId: number) =>
   get<StoreLayout>(`/stores/${storeId}/layout`);
 
+// ───────────── entrance insights ─────────────
+
+export type EntranceMetrics = {
+  id: number;
+  code: string;
+  name: string;
+  type: string;
+  position_x: number;
+  position_y: number;
+  today_count: number;
+  weekday_avg: number;
+  weekend_avg: number;
+  conversion_rate: number;
+  weekday_conv: number;
+  weekend_conv: number;
+};
+
+export type EntranceDailyPoint = {
+  date: string;
+  counts: Record<string, number>;
+};
+
+export type EntranceInsights = {
+  period: string;
+  entrances: EntranceMetrics[];
+  daily_series: EntranceDailyPoint[];
+};
+
+export const getStoreEntranceInsights = (storeId: number) =>
+  get<EntranceInsights>(`/stores/${storeId}/entrances/insights`);
+
 // ───────────── product insights ─────────────
 
 export type ProductInsightAgeRow = {
