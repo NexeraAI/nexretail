@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.areas.model import Area
 from app.behavior_events.model import BehaviorEvent
 from app.behavior_events.schema import BehaviorEventOut
+from app.common.exceptions import NotFoundException
 from app.common.schema import Page as PageSchema
 from app.entrances.model import Entrance
 from app.visitor_positions.model import VisitorPosition
@@ -75,11 +76,11 @@ class VisitorSessionsService:
         )
 
     @staticmethod
-    def get_visitor(db: Session, vid: int) -> VisitorDetail | None:
-        """取單客詳情（含 entrance 關聯）；不存在回 None。"""
+    def get_visitor(db: Session, vid: int) -> VisitorDetail:
+        """取單客詳情（含 entrance 關聯）；不存在 raise NotFoundException。"""
         v = db.get(VisitorSession, vid)
         if not v:
-            return None
+            raise NotFoundException("Visitor session not found")
         entrance = db.get(Entrance, v.entrance_id) if v.entrance_id else None
         return VisitorDetail(
             **VisitorSummary.model_validate(v).model_dump(),
@@ -90,10 +91,10 @@ class VisitorSessionsService:
         )
 
     @staticmethod
-    def list_behaviors(db: Session, vid: int) -> list[BehaviorEventOut] | None:
+    def list_behaviors(db: Session, vid: int) -> list[BehaviorEventOut]:
         """顧客行為時序（進店→駐足→觸摸→商談…），按 started_at 排序。"""
         if not db.get(VisitorSession, vid):
-            return None
+            raise NotFoundException("Visitor session not found")
         rows = db.scalars(
             select(BehaviorEvent)
             .where(BehaviorEvent.session_id == vid)
@@ -112,7 +113,7 @@ class VisitorSessionsService:
         ]
 
     @staticmethod
-    def get_area_dwell(db: Session, vid: int) -> list[AreaDwellOut] | None:
+    def get_area_dwell(db: Session, vid: int) -> list[AreaDwellOut]:
         """
         顧客在各區的總停留秒數。
 
@@ -121,7 +122,7 @@ class VisitorSessionsService:
         """
         v = db.get(VisitorSession, vid)
         if not v:
-            return None
+            raise NotFoundException("Visitor session not found")
         rows = db.execute(
             select(
                 Area.id,
@@ -142,10 +143,10 @@ class VisitorSessionsService:
         ]
 
     @staticmethod
-    def get_path(db: Session, vid: int) -> VisitorPath | None:
+    def get_path(db: Session, vid: int) -> VisitorPath:
         """回傳顧客完整軌跡點（按 t 升冪）供 main 頁重播。"""
         if not db.get(VisitorSession, vid):
-            return None
+            raise NotFoundException("Visitor session not found")
         rows = db.scalars(
             select(VisitorPosition)
             .where(VisitorPosition.session_id == vid)

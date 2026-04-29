@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from sqlalchemy.orm import Session
 
 from app.behavior_events.model import BehaviorEvent
+from app.common.exceptions import NotFoundException
 from app.edge.schema import BehaviorIn, PositionIn, VisitExitIn, VisitIn
 from app.visitor_positions.model import VisitorPosition
 from app.visitor_sessions.const import STATUS_ACTIVE, STATUS_LEFT
@@ -45,11 +46,11 @@ class EdgeIngestService:
         return v
 
     @staticmethod
-    def end_visit(db: Session, vid: int, payload: VisitExitIn) -> VisitorSession | None:
-        """補 `exited_at`、回算 `stay_seconds`、status 改為 left；vid 不存在回 None。"""
+    def end_visit(db: Session, vid: int, payload: VisitExitIn) -> VisitorSession:
+        """補 `exited_at`、回算 `stay_seconds`、status 改為 left；vid 不存在 raise NotFoundException。"""
         v = db.get(VisitorSession, vid)
         if v is None:
-            return None
+            raise NotFoundException("Visitor session not found")
         v.exited_at = payload.exited_at
         v.stay_seconds = max(
             int((_aware_utc(payload.exited_at) - _aware_utc(v.entered_at)).total_seconds()), 0
@@ -62,11 +63,11 @@ class EdgeIngestService:
     @staticmethod
     def insert_positions(
         db: Session, vid: int, points: list[PositionIn]
-    ) -> int | None:
-        """批次插入軌跡點；`store_id` 從 session 反查（地端不必送）。vid 不存在回 None。"""
+    ) -> int:
+        """批次插入軌跡點；`store_id` 從 session 反查（地端不必送）。vid 不存在 raise NotFoundException。"""
         v = db.get(VisitorSession, vid)
         if v is None:
-            return None
+            raise NotFoundException("Visitor session not found")
         if not points:
             return 0
         rows = [
@@ -87,11 +88,11 @@ class EdgeIngestService:
     @staticmethod
     def insert_behaviors(
         db: Session, vid: int, events: list[BehaviorIn]
-    ) -> int | None:
-        """批次插入行為事件；duration_seconds 缺但有 ended_at 時自動回算。vid 不存在回 None。"""
+    ) -> int:
+        """批次插入行為事件；duration_seconds 缺但有 ended_at 時自動回算。vid 不存在 raise NotFoundException。"""
         v = db.get(VisitorSession, vid)
         if v is None:
-            return None
+            raise NotFoundException("Visitor session not found")
         if not events:
             return 0
         rows: list[BehaviorEvent] = []

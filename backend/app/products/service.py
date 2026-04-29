@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.behavior_events.const import BEHAVIOR_TOUCH
 from app.behavior_events.model import BehaviorEvent
+from app.common.exceptions import NotFoundException
 from app.products.model import Product
 from app.products.schema import (
     ProductInsightAgeRow,
@@ -76,16 +77,16 @@ class ProductsService:
         ]
 
     @staticmethod
-    def get_product(db: Session, pid: int) -> ProductOut | None:
-        """取單品 + 統計；不存在回 None 由 controller 轉 404。"""
+    def get_product(db: Session, pid: int) -> ProductOut:
+        """取單品 + 統計；不存在 raise NotFoundException。"""
         p = db.get(Product, pid)
         if not p:
-            return None
+            raise NotFoundException("Product not found")
         avg_view, touches = ProductsService.stats(db, pid)
         return _to_out(p, avg_view=avg_view, touches=touches)
 
     @staticmethod
-    def get_insights(db: Session, pid: int, recent_limit: int = 12) -> ProductInsightOut | None:
+    def get_insights(db: Session, pid: int, recent_limit: int = 12) -> ProductInsightOut:
         """
         該商品的細節分析 — 互動者人口統計、行為分佈、最近互動顧客。
 
@@ -93,10 +94,10 @@ class ProductsService:
         因此前端拿來當「人數」比直接用 events 數量更合理。
 
         商品從未被互動時不視為錯誤：仍回 ProductInsightOut，但全 0 / 空陣列；
-        product 本身不存在才回 None 由 controller 轉 404。
+        product 本身不存在才 raise NotFoundException。
         """
         if not db.get(Product, pid):
-            return None
+            raise NotFoundException("Product not found")
 
         avg_view, _ = ProductsService.stats(db, pid)
         total_seconds = int(

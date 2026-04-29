@@ -1,6 +1,6 @@
 """edge ingest HTTP 端點 — /edge 系列，地端設備呼叫。"""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from app.deps import DbSession
 from app.edge.schema import (
@@ -16,11 +16,6 @@ from app.edge.service import EdgeIngestService
 router = APIRouter(prefix="/edge", tags=["edge"])
 
 
-def _not_found() -> HTTPException:
-    """共用 404 — 三個 /edge/visits/{vid}/* 端點通用。"""
-    return HTTPException(404, {"code": "not_found", "message": "Visitor session not found"})
-
-
 @router.post("/visits", response_model=VisitOut, status_code=201)
 def create_visit(payload: VisitIn, db: DbSession) -> VisitOut:
     """顧客進店 — 建立一筆 visitor_session，status 預設 active。"""
@@ -32,8 +27,6 @@ def create_visit(payload: VisitIn, db: DbSession) -> VisitOut:
 def end_visit(vid: int, payload: VisitExitIn, db: DbSession) -> VisitOut:
     """顧客離店 — server 回算 stay_seconds、status 改 left。"""
     v = EdgeIngestService.end_visit(db, vid, payload)
-    if v is None:
-        raise _not_found()
     return VisitOut(id=v.id)
 
 
@@ -43,8 +36,6 @@ def upload_positions(
 ) -> IngestResult:
     """軌跡點批次上傳；store_id 由 server 從 session 反查。"""
     n = EdgeIngestService.insert_positions(db, vid, payload)
-    if n is None:
-        raise _not_found()
     return IngestResult(inserted=n)
 
 
@@ -54,6 +45,4 @@ def upload_behaviors(
 ) -> IngestResult:
     """行為事件批次上傳；behavior_type 必須是 BEHAVIOR_CODES 之一。"""
     n = EdgeIngestService.insert_behaviors(db, vid, payload)
-    if n is None:
-        raise _not_found()
     return IngestResult(inserted=n)

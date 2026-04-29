@@ -12,6 +12,7 @@ from app.behavior_events.const import (
     BEHAVIOR_TOUCH,
 )
 from app.behavior_events.model import BehaviorEvent
+from app.common.exceptions import NotFoundException
 from app.entrances.model import Entrance
 from app.entrances.schema import (
     EntranceDailyPointOut,
@@ -65,7 +66,7 @@ class EntrancesService:
         return out
 
     @staticmethod
-    def get_insights(db: Session, store_id: int) -> EntranceInsightsOut | None:
+    def get_insights(db: Session, store_id: int) -> EntranceInsightsOut:
         """
         近 30 天每入口聚合 — 給前端 entrance 頁。
 
@@ -78,7 +79,7 @@ class EntrancesService:
         規模下 round-trip 比 N 次 SQL 來得划算，且邏輯一目了然。
         """
         if db.get(Store, store_id) is None:
-            return None
+            raise NotFoundException("Store not found")
 
         # 30 天視窗對齊：含今日，往前回推 29 天。讓資料窗 (entered_at >= since)
         # 與分母 (range(30)) / daily_series 桶 (start_date..start_date+29) 同口徑，

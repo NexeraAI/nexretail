@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.areas.model import Area
 from app.areas.schema import AreaOut
+from app.common.exceptions import NotFoundException
 from app.behavior_events.const import (
     BEHAVIOR_BROWSE,
     BEHAVIOR_QR_SCAN,
@@ -100,15 +101,15 @@ class StoresService:
         ]
 
     @staticmethod
-    def get_store(db: Session, store_id: int) -> StoreOut | None:
-        """取單店；不存在回 None 由 controller 轉 404。"""
+    def get_store(db: Session, store_id: int) -> StoreOut:
+        """取單店；不存在 raise NotFoundException。"""
         s = db.get(Store, store_id)
         if not s:
-            return None
+            raise NotFoundException("Store not found")
         return _to_out(s, traffic=StoresService.month_traffic(db, store_id))
 
     @staticmethod
-    def get_layout(db: Session, store_id: int) -> StoreLayoutOut | None:
+    def get_layout(db: Session, store_id: int) -> StoreLayoutOut:
         """
         取單店完整 layout — store + areas + entrances + products。
 
@@ -116,7 +117,7 @@ class StoresService:
         """
         s = db.get(Store, store_id)
         if not s:
-            return None
+            raise NotFoundException("Store not found")
         areas = db.scalars(
             select(Area).where(Area.store_id == store_id).order_by(Area.display_order, Area.id)
         ).all()
@@ -129,7 +130,7 @@ class StoresService:
         )
 
     @staticmethod
-    def get_overview(db: Session, store_id: int) -> StoreOverviewOut | None:
+    def get_overview(db: Session, store_id: int) -> StoreOverviewOut:
         """
         近 30 天的 overview 聚合 — 一次回傳前端 dashboard 所有圖表用的數字。
 
@@ -138,7 +139,7 @@ class StoresService:
         """
         s = db.get(Store, store_id)
         if not s:
-            return None
+            raise NotFoundException("Store not found")
 
         since = datetime.now(UTC) - timedelta(days=30)
         sess_filter = (
