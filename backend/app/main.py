@@ -4,12 +4,14 @@ import logging
 import uuid
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app import (
     areas,
+    edge,
     entrances,
     products,
     stores,
@@ -83,12 +85,16 @@ async def http_exc_handler(_: Request, exc: HTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exc_handler(_: Request, exc: RequestValidationError):
-    """將 pydantic / FastAPI 的 422 validation error 包進統一 envelope。"""
+    """將 pydantic / FastAPI 的 422 validation error 包進統一 envelope。
+
+    `errors()` 的 `ctx` 會帶原始 ValueError 物件（field_validator 拋的），
+    直接丟給 JSONResponse 會炸；先用 jsonable_encoder 洗成 JSON-safe。
+    """
     return _envelope(
         code="validation_error",
         message="Request validation failed",
         status_code=422,
-        details={"errors": exc.errors()},
+        details={"errors": jsonable_encoder(exc.errors())},
     )
 
 
@@ -105,6 +111,7 @@ areas.init_app(app)
 entrances.init_app(app)
 products.init_app(app)
 visitor_sessions.init_app(app)
+edge.init_app(app)
 
 
 @app.get("/health", tags=["meta"])
