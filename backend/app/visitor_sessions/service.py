@@ -92,7 +92,7 @@ class VisitorSessionsService:
 
     @staticmethod
     def list_behaviors(db: Session, vid: int) -> list[BehaviorEventOut]:
-        """顧客行為時序（進店→駐足→觸摸→商談…），按 started_at 排序。"""
+        """顧客行為時序（進店→駐足→觸摸→商談…），按 started_at 排序；vid 不存在 raise NotFoundException。"""
         if not db.get(VisitorSession, vid):
             raise NotFoundException("Visitor session not found")
         rows = db.scalars(
@@ -115,7 +115,7 @@ class VisitorSessionsService:
     @staticmethod
     def get_area_dwell(db: Session, vid: int) -> list[AreaDwellOut]:
         """
-        顧客在各區的總停留秒數。
+        顧客在各區的總停留秒數；vid 不存在 raise NotFoundException。
 
         用 outer join 確保未停留的區域仍出現在結果中（dwell_seconds=0）；
         `.where(Area.store_id == v.store_id)` 避免列出其他店的區域。
@@ -144,7 +144,7 @@ class VisitorSessionsService:
 
     @staticmethod
     def get_path(db: Session, vid: int) -> VisitorPath:
-        """回傳顧客完整軌跡點（按 t 升冪）供 main 頁重播。"""
+        """回傳顧客完整軌跡點（按 t 升冪）供 main 頁重播；vid 不存在 raise NotFoundException。"""
         if not db.get(VisitorSession, vid):
             raise NotFoundException("Visitor session not found")
         rows = db.scalars(

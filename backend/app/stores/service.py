@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.areas.model import Area
 from app.areas.schema import AreaOut
-from app.common.exceptions import NotFoundException
 from app.behavior_events.const import (
     BEHAVIOR_BROWSE,
     BEHAVIOR_QR_SCAN,
@@ -16,6 +15,7 @@ from app.behavior_events.const import (
     BEHAVIOR_TOUCH,
 )
 from app.behavior_events.model import BehaviorEvent
+from app.common.exceptions import NotFoundException
 from app.entrances.model import Entrance
 from app.entrances.schema import EntranceOut
 from app.products.service import ProductsService

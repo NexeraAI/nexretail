@@ -4,10 +4,10 @@ from fastapi import HTTPException
 
 
 class NotFoundException(HTTPException):
-    """404 — 對應錯誤 envelope 的 `code: not_found`。"""
+    """404 — 對應錯誤 envelope 的 `code: not_found`；`details` 可選擇性帶結構化 context。"""
 
-    def __init__(self, message: str = "Resource not found"):
+    def __init__(self, message: str, details: dict | None = None):
         super().__init__(
             status_code=404,
-            detail={"code": "not_found", "message": message},
+            detail={"code": "not_found", "message": message, "details": details},
         )
