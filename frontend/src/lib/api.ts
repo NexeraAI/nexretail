@@ -1,13 +1,15 @@
 /**
  * Backend API client — typed wrappers over fetch().
  *
- * Base URL comes from NEXT_PUBLIC_API_BASE; defaults to http://localhost:8000/api/v1.
+ * Default base path is "/api/v1" — same-origin; the Next.js server proxies
+ * /api/* to the real backend via next.config.ts rewrites (see BACKEND_URL).
+ * Override with NEXT_PUBLIC_API_BASE if you need to bypass the proxy.
+ *
  * Backend wraps all errors as { error: { code, message, traceId, details } }; we
  * surface that as a thrown ApiError on non-2xx responses.
  */
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000/api/v1";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "/api/v1";
 
 export class ApiError extends Error {
   constructor(
