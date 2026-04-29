@@ -20,11 +20,11 @@ class VisitIn(BaseModel):
     """
 
     store_id: int
-    anon_id: str
+    anon_id: str = Field(max_length=64)
     entered_at: datetime
     gender: str
     age_group: str
-    companion_count: int = 0
+    companion_count: int = Field(default=0, ge=0)
     entrance_id: int | None = None
     thumbnail_url: str | None = None
     full_body_url: str | None = None
