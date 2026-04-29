@@ -8,7 +8,9 @@ RUN npm ci
 
 FROM node:20-alpine AS builder
 WORKDIR /app
-ARG BACKEND_URL=http://localhost:8000
+# Required. Consumed by next.config.ts rewrites at build time and baked into
+# the routes manifest. Must be passed via --build-arg; runtime env is ignored.
+ARG BACKEND_URL
 ENV NEXT_TELEMETRY_DISABLED=1 \
     BACKEND_URL=$BACKEND_URL
 COPY --from=deps /app/node_modules ./node_modules

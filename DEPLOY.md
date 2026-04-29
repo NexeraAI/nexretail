@@ -6,8 +6,8 @@ Demo 部署紀錄 — 2026-04-29 第一次上線。
 
 | Service  | URL                                                  | Image                                                                       |
 | -------- | ---------------------------------------------------- | --------------------------------------------------------------------------- |
-| Frontend | https://frontend-75879180915.asia-east1.run.app      | `asia-east1-docker.pkg.dev/.../nexretail/frontend:v1`                       |
-| Backend  | https://backend-75879180915.asia-east1.run.app       | `asia-east1-docker.pkg.dev/.../nexretail/backend:v1`                        |
+| Frontend | https://frontend-75879180915.asia-east1.run.app      | `asia-east1-docker.pkg.dev/nexretail-camera-station-v2/nexretail/frontend:v1` |
+| Backend  | https://backend-75879180915.asia-east1.run.app       | `asia-east1-docker.pkg.dev/nexretail-camera-station-v2/nexretail/backend:v1`  |
 
 - **Project**: `nexretail-camera-station-v2`
 - **Region**: `asia-east1`
@@ -118,7 +118,8 @@ gcloud run deploy frontend \
 
 ```bash
 gcloud run revisions list --service=backend --region=asia-east1
-gcloud run services update-traffic backend --to-revisions=backend-00001-q7k=100 --region=asia-east1
+# Replace <REVISION_NAME> with the suffix from the list above (e.g. backend-00001-abc)
+gcloud run services update-traffic backend --to-revisions=<REVISION_NAME>=100 --region=asia-east1
 ```
 
 ## Cost

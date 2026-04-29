@@ -3,7 +3,8 @@
  *
  * Default base path is "/api/v1" — same-origin; the Next.js server proxies
  * /api/* to the real backend via next.config.ts rewrites (see BACKEND_URL).
- * Override with NEXT_PUBLIC_API_BASE if you need to bypass the proxy.
+ * Note: BACKEND_URL is baked into the rewrite at `next build` time;
+ * NEXT_PUBLIC_API_BASE is the only way to override at runtime.
  *
  * Backend wraps all errors as { error: { code, message, traceId, details } }; we
  * surface that as a thrown ApiError on non-2xx responses.
